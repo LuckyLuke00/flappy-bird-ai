@@ -86,6 +86,11 @@
       <AdditionalDependencies>raylib.lib;winmm.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../lib/raylib/32-bit;../lib/vld/32-bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)..\lib\vld\32-bit\vld_x64.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\32-bit\dbghelp.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\32-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /y /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -106,6 +111,11 @@
       <AdditionalDependencies>raylib.lib;winmm.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../lib/raylib/32-bit;../lib/vld/32-bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)..\lib\vld\32-bit\vld_x64.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\32-bit\dbghelp.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\32-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /y /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -122,6 +132,11 @@
       <AdditionalLibraryDirectories>../lib/raylib/64-bit;../lib/vld/64-bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;winmm.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)..\lib\vld\64-bit\vld_x64.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\64-bit\dbghelp.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\64-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /y /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -142,6 +157,11 @@
       <AdditionalLibraryDirectories>../lib/raylib/64-bit;../lib/vld/64-bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>raylib.lib;winmm.lib;vld.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)..\lib\vld\64-bit\vld_x64.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\64-bit\dbghelp.dll" "$(OutDir)" /y /D
+xcopy "$(SolutionDir)..\lib\vld\64-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /y /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="bird.cpp" />
