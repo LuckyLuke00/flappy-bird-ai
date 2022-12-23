@@ -87,7 +87,7 @@
       <AdditionalLibraryDirectories>../lib/raylib/32-bit;../lib/vld/32-bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)..\lib\vld\32-bit\vld_x64.dll" "$(OutDir)" /y /D
+      <Command>xcopy "$(SolutionDir)..\lib\vld\32-bit\vld_x86.dll" "$(OutDir)" /y /D
 xcopy "$(SolutionDir)..\lib\vld\32-bit\dbghelp.dll" "$(OutDir)" /y /D
 xcopy "$(SolutionDir)..\lib\vld\32-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /y /D</Command>
     </PostBuildEvent>
@@ -112,7 +112,7 @@ xcopy "$(SolutionDir)..\lib\vld\32-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" 
       <AdditionalLibraryDirectories>../lib/raylib/32-bit;../lib/vld/32-bit;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)..\lib\vld\32-bit\vld_x64.dll" "$(OutDir)" /y /D
+      <Command>xcopy "$(SolutionDir)..\lib\vld\32-bit\vld_x86.dll" "$(OutDir)" /y /D
 xcopy "$(SolutionDir)..\lib\vld\32-bit\dbghelp.dll" "$(OutDir)" /y /D
 xcopy "$(SolutionDir)..\lib\vld\32-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" /y /D</Command>
     </PostBuildEvent>
