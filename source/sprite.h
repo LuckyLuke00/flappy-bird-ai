@@ -25,8 +25,8 @@ public:
 	// Getters
 	const Rectangle& GetSrcRect() const { return m_SrcRect; }
 	const Vector2& GetPosition() const { return m_Position; }
-	float GetHeight() const { return m_SrcRect.height * m_Scale.y * s_GlobalScale.y; }
-	float GetWidth() const { return m_SrcRect.width * m_Scale.x * s_GlobalScale.x; }
+	float GetHeight() const { return m_SrcRect.height * (m_Scale.y * s_GlobalScale.y); }
+	float GetWidth() const { return m_SrcRect.width * (m_Scale.x * s_GlobalScale.x); }
 	Vector2 GetScale() const { return m_Scale; }
 
 	static const Vector2& GetGlobalScale() { return s_GlobalScale; }

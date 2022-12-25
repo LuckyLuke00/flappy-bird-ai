@@ -1,8 +1,11 @@
 #include "raylib.h"
+#include "raymath.h"
 
 #include "game.h"
 
 #include "constants.h"
+
+#include <iostream>
 
 const Texture2D* Game::s_pSpriteSheet{ nullptr };
 
@@ -11,18 +14,9 @@ Game::Game()
 	// Load the sprite sheet
 	s_pSpriteSheet = new const Texture2D{ LoadTexture(SPRITE_SHEET_PATH) };
 
-	// Calculate the global scale based on the screen size and the background sprite size, as the background
-	// Should cover the whole height of the screen.
-	const float scaleToScreenHeight{ static_cast<float>(GetScreenHeight()) / m_Background.GetSrcRect().height };
-	Sprite::SetGlobalScale({ scaleToScreenHeight, scaleToScreenHeight });
+	ConfigureGameScreen();
 
-	// Select a random background sprite
 	SelectRandomBackground();
-
-	// Set the ground sprite to the bottom of the screen
-	m_Ground.SetPosition({ .0f, static_cast<float>(GetScreenHeight()) - m_Ground.GetHeight() });
-
-	m_Bird.CenterOnScreen();
 }
 
 Game::~Game()
@@ -38,7 +32,7 @@ void Game::Update(float elapsedSec)
 void Game::Draw() const
 {
 	BeginDrawing();
-	ClearBackground(RAYWHITE);
+	ClearBackground(RED);
 
 	m_Background.Draw(); // Draw first
 
@@ -48,10 +42,17 @@ void Game::Draw() const
 
 	if (m_ShowFps)
 	{
-		DrawFPS(10, 10);
+		constexpr int padding{ 20 };
+		constexpr int fontSize{ 20 };
+		DrawText(TextFormat("FPS: %i", GetFPS()), static_cast<int>(m_Background.GetPosition().x + padding), padding, fontSize, BLACK);
 	}
 
 	EndDrawing();
+}
+
+void Game::OnWindowResize()
+{
+	ConfigureGameScreen();
 }
 
 void Game::ToggleFps()
@@ -66,6 +67,57 @@ void Game::CleanUp()
 	s_pSpriteSheet = nullptr;
 }
 
+void Game::ConfigureGameScreen()
+{
+	// Calculate the global scale based on the screen size and the background sprite size, as the background
+	// Should cover the whole height of the screen.
+	const float scaleToScreenHeight{ static_cast<float>(GetScreenHeight()) / m_Background.GetSrcRect().height };
+	Sprite::SetGlobalScale({ scaleToScreenHeight, scaleToScreenHeight });
+
+	// Center the sprites
+	m_Background.CenterOnScreen();
+	m_Bird.CenterOnScreen();
+
+	// Set the ground sprite to the bottom of the screen
+	m_Ground.SetPosition({ m_Background.GetPosition().x, static_cast<float>(GetScreenHeight()) - m_Ground.GetHeight() });
+
+	CropScreen();
+}
+
+void Game::CropScreen() const
+{
+	// This is the only way to porpperly crop the screen, without having any artifacts.
+	// Crop everything to the size of the background sprite
+	int x{};
+	int width{};
+
+	// Check if the background position.x needs to be rounded up or down
+	if (m_Background.GetPosition().x - truncf(m_Background.GetPosition().x) > .5f)
+	{
+		// Round up
+		x = static_cast<int>(ceilf(m_Background.GetPosition().x));
+
+		// Do the opposite for the width, to prevent the background color from showing
+		width = static_cast<int>(floorf(m_Background.GetWidth()));
+	}
+	else
+	{
+		// Round down
+		x = static_cast<int>(floorf(m_Background.GetPosition().x));
+
+		// Do the opposite for the width, to prevent the background color from showing
+		width = static_cast<int>(ceilf(m_Background.GetWidth()));
+	}
+
+	BeginScissorMode
+	(
+		x,
+		static_cast<int>(m_Background.GetPosition().y),
+		width,
+		static_cast<int>(m_Background.GetHeight())
+	);
+}
+
 void Game::SelectRandomBackground()
 {
 	const float random{ static_cast<float>(GetRandomValue(0, 1)) };
@@ -73,7 +125,7 @@ void Game::SelectRandomBackground()
 	// Modify the source rectangle of the background sprite to select a random background
 	Rectangle srcRect{ m_Background.GetSrcRect() };
 	const float offset{ srcRect.width + 2.f }; // +2.f to account for the 2px gap between sprites
-	srcRect.x = offset * random;
+	srcRect.x += offset * random;
 
 	m_Background.SetSrcRect(srcRect);
 }
@@ -87,7 +139,7 @@ void Game::MoveGround(float elapsedSec, const float speed)
 
 	m_Ground.SetPosition(pos);
 
-	if (m_Ground.GetPosition().x < -offset)
+	if (m_Ground.GetPosition().x < m_Background.GetPosition().x - offset)
 	{
 		// If the ground sprite is completely off screen, move it to the right of the screen
 		pos.x += offset;
