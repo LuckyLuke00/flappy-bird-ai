@@ -5,37 +5,38 @@
 #include "constants.h"
 #include "game.h"
 
-int main()
+int main(void)
 {
-	// Initialize the window dimensions
-	constexpr int windowWidth{ 720 };
-	constexpr int windowHeight{ 1280 };
+	// Window properties
+	const Image icon{ LoadImage(GAME_ICON_PATH) };
 
-	// Initialize the game window with the desired dimensions
-	InitWindow(windowWidth, windowHeight, "Flappy Bird AI");
+	// Should always be 9:16
+	constexpr int screenHeight{ 1280 };
+	constexpr int screenWidth{ 720 };
 
-	// Set the icon for the game window
-	const Image* pIcon{ new Image{ LoadImage(GAME_ICON_PATH) } };
-	SetWindowIcon(*pIcon);
+	// Window initialization
+	InitWindow(screenWidth, screenHeight, WINDOW_TITLE);
+	SetWindowIcon(icon);
 
-	Game game{};
+	// This needs to be after the window initialization, Textures require a valid OpenGL context.
+	Game* pGame{ new Game{} };
+	pGame->ToggleFps();
 
 	// Main game loop
 	while (!WindowShouldClose())
 	{
-		BeginDrawing();
+		pGame->Update(GetFrameTime());
 
-		game.Draw();
-
-		EndDrawing();
+		pGame->Draw();
 	}
+
+	// Clean-up resources
+	UnloadImage(icon);
+
+	delete pGame;
+	pGame = nullptr;
 
 	CloseWindow();
 
-	// Unload the icon
-	UnloadImage(*pIcon);
-	delete pIcon;
-	pIcon = nullptr;
-
 	return 0;
-};
+}

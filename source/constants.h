@@ -1,10 +1,12 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
 
-constexpr float GRAVITY{ 0.5f };
-constexpr float FLAP_VELOCITY{ -6.f };
+constexpr float FLAP_FORCE{ .25f };
+constexpr float GRAVITY{ .5f };
+constexpr float MAX_FALL_SPEED{ .25f };
 
-const char* const SPRITE_SHEET_PATH{ "../assets/images/spritesheet.png" };
 const char* const GAME_ICON_PATH{ "../assets/images/icon.png" };
+const char* const SPRITE_SHEET_PATH{ "../assets/images/spritesheet.png" };
+const char* const WINDOW_TITLE{ "Flappy Bird AI" };
 
 #endif

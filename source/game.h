@@ -1,30 +1,37 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "structs.h"
+#include "sprite.h"
 
-class Game
+class Game final
 {
 public:
 	explicit Game();
 
 	Game(const Game& other) = delete;
-	Game(Game&& other) = delete;
 	Game& operator=(const Game& other) = delete;
+	Game(Game&& other) = delete;
 	Game& operator=(Game&& other) = delete;
 
-	virtual ~Game();
+	~Game();
 
-	void Update();
+	void Update(float elapsedSec);
 	void Draw() const;
 
-	const Texture2D* GetSpriteSheet() const;
-private:
-	const Texture2D* m_pSpriteSheet;
-	Sprite m_Background;
+	void ToggleFps();
+	static const Texture2D* GetSpriteSheet() { return s_pSpriteSheet; }
 
-	void LoadAssets();
-	void UnloadAssets();
+private:
+	static const Texture2D* s_pSpriteSheet;
+	Sprite m_Background{ { .0f, .0f, 144.f , 256.f } };
+	Sprite m_Ground{ { 292.f, .0f, 168.f, 56.f } };
+	Sprite m_Bird{ { 3.f, 491.f, 17.f, 12.f } }; // Temporary
+
+	bool m_ShowFps{ false };
+
+	void SelectRandomBackground();
+	void MoveGround(float elapsedSec, const float speed);
+	void CleanUp();
 };
 
 #endif
