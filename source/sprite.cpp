@@ -11,10 +11,6 @@ Sprite::Sprite(const Rectangle& srcRect, const Vector2& pos, const Vector2& scal
 {
 }
 
-Sprite::~Sprite()
-{
-}
-
 void Sprite::Draw() const
 {
 	DrawTexturePro

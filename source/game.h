@@ -1,7 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "sprite.h"
+#include "bird.h"
 
 class Game final
 {
@@ -26,9 +26,9 @@ public:
 
 private:
 	static const Texture2D* s_pSpriteSheet;
-	Sprite m_Background{ { .0f, .0f, 144.f , 256.f } };
-	Sprite m_Ground{ { 292.f, .0f, 168.f, 56.f } };
-	Sprite m_Bird{ { 3.f, 491.f, 17.f, 12.f } }; // Temporary
+	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
+	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
+	Bird m_Bird{};
 
 	// Fps values
 	bool m_ShowFps{ false };

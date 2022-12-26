@@ -13,7 +13,7 @@ public:
 	Sprite(Sprite&& other) = delete;
 	Sprite& operator=(Sprite&& other) = delete;
 
-	virtual ~Sprite();
+	virtual ~Sprite() = default;
 
 	void Draw() const;
 
@@ -34,7 +34,9 @@ public:
 	// Setters
 	void SetPosition(const Vector2& pos) { m_Position = pos; }
 	void SetScale(const Vector2& scale) { m_Scale = scale; }
-	void SetSrcRect(const Rectangle& srcRect) { m_SrcRect = srcRect; }
+	void SetSrcRectPos(const Vector2& pos) { m_SrcRect.x = pos.x; m_SrcRect.y = pos.y; }
+	void SetSrcRectPos(const float x, const float y) { m_SrcRect.x = x; m_SrcRect.y = y; }
+	//void SetSrcRect(const Rectangle& srcRect) { m_SrcRect = srcRect; }
 
 	static void SetGlobalScale(const Vector2& scale) { s_GlobalScale = scale; }
 
