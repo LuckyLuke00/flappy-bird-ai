@@ -1,5 +1,6 @@
 #include "bird.h"
 #include <iostream>
+#include "constants.h"
 
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
@@ -8,9 +9,17 @@ Bird::Bird()
 	m_BirdAnimation.Play();
 }
 
-void Bird::Update(float elapsedSec)
+void Bird::Update()
 {
-	m_BirdAnimation.Update(elapsedSec);
+	m_BirdAnimation.Update(GetFrameTime());
+
+	// TODO: Seperate the below into functions
+	MoveBird();
+}
+
+void Bird::Flap()
+{
+	m_VerticalSpeed = -500;
 }
 
 void Bird::SelectRandomBird()
@@ -26,6 +35,12 @@ void Bird::Reset()
 	m_BirdSprite.CenterOnScreen();
 	m_BirdAnimation.Stop();
 	m_BirdAnimation.Play();
+}
+
+void Bird::MoveBird()
+{
+	m_BirdSprite.SetPosition({ m_BirdSprite.GetPosition().x, m_BirdSprite.GetPosition().y + m_VerticalSpeed * GetFrameTime() });
+	m_VerticalSpeed += 1000 * GetFrameTime();
 }
 
 void Bird::Draw() const

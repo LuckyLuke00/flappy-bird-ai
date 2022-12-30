@@ -27,7 +27,14 @@ Game::~Game()
 void Game::Update(float elapsedSec)
 {
 	MoveGround(elapsedSec, 250.f);
-	m_Bird.Update(elapsedSec);
+
+	// If spacebar is pressed, flap the bird
+	if (IsKeyPressed(KEY_SPACE))
+	{
+		m_Bird.Flap();
+	}
+
+	m_Bird.Update();
 }
 
 void Game::Draw() const

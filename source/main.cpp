@@ -12,7 +12,7 @@ int main(void)
 
 	// Window initialization
 	// Start minimized to prevent the window from flashing on the screen
-	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
+	InitWindow(GAME_WIDTH, GAME_HEIGHT, WINDOW_TITLE);
 
 	// Scale the window resolution according to the main monitor's resolution
 	// We need to do this now because we can only get the monitor's resolution after the window is initialized
@@ -32,6 +32,9 @@ int main(void)
 
 	// Center the window
 	SetWindowPosition((monitorWidth - windowWidth) / 2, (monitorHeight - windowHeight) / 2);
+
+	// Limit fps
+	//SetTargetFPS(60);
 
 	// Set window to resizable
 	SetWindowState(FLAG_WINDOW_RESIZABLE);

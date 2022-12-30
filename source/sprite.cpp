@@ -1,6 +1,8 @@
 #include "sprite.h"
 #include "Game.h"
 
+#include <iostream>
+
 Vector2 Sprite::s_GlobalScale{ 1.f, 1.f };
 
 Sprite::Sprite(const Rectangle& srcRect, const Vector2& pos, const Vector2& scale, const float rotation)
