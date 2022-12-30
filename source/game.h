@@ -26,6 +26,7 @@ public:
 
 private:
 	bool m_StartGame{ false };
+	bool m_GameOver{ false };
 
 	static const Texture2D* s_pSpriteSheet;
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
@@ -43,6 +44,7 @@ private:
 	void CleanUp();
 
 	void HandleInput();
+	void HandleCollision();
 };
 
 #endif

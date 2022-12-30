@@ -26,6 +26,10 @@ public:
 	void SelectRandomBird();
 	void Reset();
 
+	// Getters
+	const Vector2& GetPosition() const { return m_BirdSprite.GetPosition(); }
+	const float GetHeight() const { return m_BirdSprite.GetHeight(); }
+
 private:
 	float m_VerticalSpeed{ .0f };
 	float m_FlapStartPos{ .0f };

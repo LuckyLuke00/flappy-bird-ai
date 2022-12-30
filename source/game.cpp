@@ -28,11 +28,13 @@ void Game::Update(float elapsedSec)
 {
 	HandleInput();
 
+	if (m_GameOver) return;
 	MoveGround(elapsedSec, 250.f);
 	m_Bird.UpdateAnimation(elapsedSec);
 
 	if (!m_StartGame) return;
 	m_Bird.Update(elapsedSec);
+	HandleCollision();
 }
 
 void Game::Draw() const
@@ -91,6 +93,15 @@ void Game::HandleInput()
 	{
 		m_StartGame = true;
 		m_Bird.Flap();
+	}
+}
+
+void Game::HandleCollision()
+{
+	// Check if the bird has collided with the ground
+	if (m_Bird.GetPosition().y + m_Bird.GetHeight() >= m_GroundSprite.GetPosition().y)
+	{
+		m_GameOver = true;
 	}
 }
 
