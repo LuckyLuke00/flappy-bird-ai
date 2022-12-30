@@ -26,15 +26,13 @@ Game::~Game()
 
 void Game::Update(float elapsedSec)
 {
+	HandleInput();
+
 	MoveGround(elapsedSec, 250.f);
+	m_Bird.UpdateAnimation(elapsedSec);
 
-	// If spacebar is pressed, flap the bird
-	if (IsKeyPressed(KEY_SPACE))
-	{
-		m_Bird.Flap();
-	}
-
-	m_Bird.Update();
+	if (!m_StartGame) return;
+	m_Bird.Update(elapsedSec);
 }
 
 void Game::Draw() const
@@ -55,6 +53,11 @@ void Game::Draw() const
 		DrawText(TextFormat("FPS: %i", GetFPS()), static_cast<int>(m_BackgroundSprite.GetPosition().x + padding), padding, fontSize, BLACK);
 	}
 
+	//// DEBUG
+	//// Draw the two lines in through the center of the screen
+	//DrawLine(0, GetScreenHeight() / 2, GetScreenWidth(), GetScreenHeight() / 2, BLACK);
+	//DrawLine(GetScreenWidth() / 2, 0, GetScreenWidth() / 2, GetScreenHeight(), BLACK);
+
 	EndDrawing();
 }
 
@@ -73,6 +76,22 @@ void Game::CleanUp()
 	UnloadTexture(*s_pSpriteSheet);
 	delete s_pSpriteSheet;
 	s_pSpriteSheet = nullptr;
+}
+
+void Game::HandleInput()
+{
+	// Toggle fps
+	if (IsKeyPressed(KEY_F))
+	{
+		ToggleFps();
+	}
+
+	// Flap the bird
+	if (IsKeyPressed(KEY_SPACE))
+	{
+		m_StartGame = true;
+		m_Bird.Flap();
+	}
 }
 
 void Game::ConfigureGameScreen()

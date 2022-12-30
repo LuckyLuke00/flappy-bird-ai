@@ -33,9 +33,6 @@ int main(void)
 	// Center the window
 	SetWindowPosition((monitorWidth - windowWidth) / 2, (monitorHeight - windowHeight) / 2);
 
-	// Limit fps
-	//SetTargetFPS(60);
-
 	// Set window to resizable
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 	SetWindowIcon(icon);
@@ -47,13 +44,13 @@ int main(void)
 	// Main game loop
 	while (!WindowShouldClose())
 	{
-		pGame->Update(GetFrameTime());
-
 		// Check if the window has been resized
 		if (IsWindowResized())
 		{
 			pGame->OnWindowResize();
 		}
+
+		pGame->Update(GetFrameTime());
 
 		pGame->Draw();
 	}

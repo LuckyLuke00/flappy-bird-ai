@@ -25,6 +25,8 @@ public:
 	static const Texture2D* GetSpriteSheet() { return s_pSpriteSheet; }
 
 private:
+	bool m_StartGame{ false };
+
 	static const Texture2D* s_pSpriteSheet;
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
@@ -39,6 +41,8 @@ private:
 	void ConfigureGameScreen();
 	void CropScreen() const;
 	void CleanUp();
+
+	void HandleInput();
 };
 
 #endif

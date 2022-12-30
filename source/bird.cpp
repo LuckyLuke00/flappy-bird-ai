@@ -1,5 +1,4 @@
 #include "bird.h"
-#include <iostream>
 #include "constants.h"
 
 Bird::Bird()
@@ -9,17 +8,39 @@ Bird::Bird()
 	m_BirdAnimation.Play();
 }
 
-void Bird::Update()
+void Bird::Update(float elapsedSec)
 {
-	m_BirdAnimation.Update(GetFrameTime());
+	// Apply gravity
+	m_VerticalSpeed += GRAVITY * elapsedSec;
 
-	// TODO: Seperate the below into functions
-	MoveBird();
+	// Clamp the vertical fall speed
+	if (m_VerticalSpeed > MAX_FALL_SPEED)
+	{
+		m_VerticalSpeed = MAX_FALL_SPEED;
+	}
+
+	// Update the position
+	m_BirdSprite.SetPosY(m_BirdSprite.GetPosition().y + m_VerticalSpeed * elapsedSec);
+
+	RotateBird(elapsedSec);
+}
+
+void Bird::Draw() const
+{
+	m_BirdSprite.Draw();
+}
+
+void Bird::UpdateAnimation(float elapsedSec)
+{
+	m_BirdAnimation.Update(elapsedSec);
 }
 
 void Bird::Flap()
 {
-	m_VerticalSpeed = -500;
+	if (IsOutOfBounds()) return;
+
+	m_FlapStartPos = m_BirdSprite.GetPosition().y;
+	m_VerticalSpeed = -FLAP_FORCE;
 }
 
 void Bird::SelectRandomBird()
@@ -37,13 +58,34 @@ void Bird::Reset()
 	m_BirdAnimation.Play();
 }
 
-void Bird::MoveBird()
+bool Bird::IsOutOfBounds() const
 {
-	m_BirdSprite.SetPosition({ m_BirdSprite.GetPosition().x, m_BirdSprite.GetPosition().y + m_VerticalSpeed * GetFrameTime() });
-	m_VerticalSpeed += 1000 * GetFrameTime();
+	// Check if the bird is out of the top of the screen
+	return m_BirdSprite.GetPosition().y < .0f;
 }
 
-void Bird::Draw() const
+bool Bird::IsFalling() const
 {
-	m_BirdSprite.Draw();
+	return (m_BirdSprite.GetPosition().y > m_FlapStartPos);
+}
+
+void Bird::RotateBird(float elapsedSec)
+{
+	if (m_VerticalSpeed < 0)
+	{
+		m_BirdSprite.Rotate(-ROTATION_SPEED_UP * elapsedSec);
+
+		if (m_BirdSprite.GetRotation() < -MAX_UPWARD_ROTATION)
+		{
+			m_BirdSprite.SetRotation(-MAX_UPWARD_ROTATION);
+		}
+	}
+	else if (IsFalling())
+	{
+		m_BirdSprite.Rotate(ROTATION_SPEED_DOWN * elapsedSec);
+		if (m_BirdSprite.GetRotation() > MAX_DOWNWARD_ROTATION)
+		{
+			m_BirdSprite.SetRotation(MAX_DOWNWARD_ROTATION);
+		}
+	}
 }
