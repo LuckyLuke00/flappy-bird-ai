@@ -27,9 +27,11 @@ public:
 	// Getters
 	const Rectangle& GetSrcRect() const { return m_SrcRect; }
 	const Vector2& GetPosition() const { return m_Position; }
-	float GetHeight() const { return m_SrcRect.height * (m_Scale.y * s_GlobalScale.y); }
 	float GetRotation() const { return m_Rotation; }
-	float GetWidth() const { return m_SrcRect.width * (m_Scale.x * s_GlobalScale.x); }
+	float GetScaledHeight() const { return m_SrcRect.height * (m_Scale.y * s_GlobalScale.y); }
+	float GetScaledWidth() const { return m_SrcRect.width * (m_Scale.x * s_GlobalScale.x); }
+	float GetWidth() const { return m_SrcRect.width; }
+	float GetHeight() const { return m_SrcRect.height; }
 	Vector2 GetScale() const { return m_Scale; }
 
 	static const Vector2& GetGlobalScale() { return s_GlobalScale; }
@@ -39,6 +41,8 @@ public:
 	void AddPosY(const float y) { m_Position.y += y * (s_GlobalScale.y); }
 
 	void SetPosition(const Vector2& pos) { m_Position = pos; }
+	void SetPosX(const float x) { m_Position.x = x; }
+	void SetPosY(const float y) { m_Position.y = y; }
 	void SetRotation(const float degrees) { m_Rotation = degrees; }
 	void SetScale(const Vector2& scale) { m_Scale = scale; }
 	void SetSrcRectPos(const float x, const float y) { m_SrcRect.x = x; m_SrcRect.y = y; }

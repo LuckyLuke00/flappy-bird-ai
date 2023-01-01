@@ -5,14 +5,21 @@
 #include "constants.h"
 
 const Texture2D* Game::s_pSpriteSheet{ nullptr };
+Rectangle Game::s_GameScreenRect{ 0.f, 0.f, GAME_WIDTH, GAME_HEIGHT };
 
 Game::Game()
 {
 	// Load the sprite sheet
 	s_pSpriteSheet = new const Texture2D{ LoadTexture(SPRITE_SHEET_PATH) };
 
-	ConfigureGameScreen();
+	// Initialize the Pipes (Fill with 3 pipes)
+	m_Pipes.reserve(MAX_PIPES);
+	for (int i{ 0 }; i < MAX_PIPES; ++i)
+	{
+		m_Pipes.emplace_back(new Pipe{});
+	}
 
+	ConfigureGameScreen();
 	SelectRandomBackground();
 }
 
@@ -32,11 +39,26 @@ void Game::Update(float elapsedSec)
 		return;
 	}
 
-	MoveGround(elapsedSec, 250.f);
+	MoveGround(elapsedSec, MOVE_SPEED);
 	m_Bird.UpdateAnimation(elapsedSec);
 
+	// Game started
 	if (!m_StartGame) return;
+
 	m_Bird.Update(elapsedSec);
+
+	for (int i{ 0 }; i < MAX_PIPES; ++i)
+	{
+		m_Pipes[i]->Update(elapsedSec);
+		if (m_Pipes[i]->IsOffScreen())
+		{
+			// Set the pipe position to the position of the pipe with index - 1
+			// But make sure it wraps around to the last pipe if the index is 0
+			m_Pipes[i]->SetPosX(m_Pipes[(i - 1 + MAX_PIPES) % MAX_PIPES]->GetPosition().x);
+			m_Pipes[i]->AddPosX(PIPE_HORIZONTAL_GAP + m_Pipes[i]->GetWidth());
+		}
+	}
+
 	HandleCollision();
 }
 
@@ -46,6 +68,11 @@ void Game::Draw() const
 	ClearBackground(RED);
 
 	m_BackgroundSprite.Draw(); // Draw first
+
+	for (const auto& pipe : m_Pipes)
+	{
+		pipe->Draw();
+	}
 
 	m_Bird.Draw();
 
@@ -57,11 +84,6 @@ void Game::Draw() const
 		constexpr int fontSize{ 20 };
 		DrawText(TextFormat("FPS: %i", GetFPS()), static_cast<int>(m_BackgroundSprite.GetPosition().x + padding), padding, fontSize, BLACK);
 	}
-
-	//// DEBUG
-	//// Draw the two lines in through the center of the screen
-	//DrawLine(0, GetScreenHeight() / 2, GetScreenWidth(), GetScreenHeight() / 2, BLACK);
-	//DrawLine(GetScreenWidth() / 2, 0, GetScreenWidth() / 2, GetScreenHeight(), BLACK);
 
 	EndDrawing();
 }
@@ -78,6 +100,12 @@ void Game::ToggleFps()
 
 void Game::CleanUp()
 {
+	for (auto& pipe : m_Pipes)
+	{
+		delete pipe;
+		pipe = nullptr;
+	}
+
 	UnloadTexture(*s_pSpriteSheet);
 	delete s_pSpriteSheet;
 	s_pSpriteSheet = nullptr;
@@ -105,7 +133,7 @@ void Game::HandleInput()
 void Game::HandleCollision()
 {
 	// Check if the bird has collided with the ground
-	if (m_Bird.GetPosition().y + m_Bird.GetHeight() >= m_GroundSprite.GetPosition().y)
+	if (m_Bird.GetPosition().y + m_Bird.GetScaledHeight() >= m_GroundSprite.GetPosition().y)
 	{
 		m_GameOver = true;
 	}
@@ -120,20 +148,30 @@ void Game::ConfigureGameScreen()
 
 	// Center the sprites
 	m_BackgroundSprite.CenterOnScreen();
+	s_GameScreenRect = { m_BackgroundSprite.GetPosition().x, m_BackgroundSprite.GetPosition().y, m_BackgroundSprite.GetScaledWidth(), m_BackgroundSprite.GetScaledHeight() };
 
 	// Set the ground sprite to the bottom of the screen
-	m_GroundSprite.SetPosition({ m_BackgroundSprite.GetPosition().x, static_cast<float>(GetScreenHeight()) - m_GroundSprite.GetHeight() });
+	m_GroundSprite.SetPosition({ m_BackgroundSprite.GetPosition().x, static_cast<float>(GetScreenHeight()) - m_GroundSprite.GetScaledHeight() });
 
 	if (!m_StartGame)
 	{
-		m_Bird.Reset();
+		m_Bird.Initialize();
+
+		for (int i{ 0 }; i < MAX_PIPES; ++i)
+		{
+			m_Pipes[i]->Initialize(PIPE_HORIZONTAL_GAP * static_cast<float>(i) + m_Pipes[i]->GetWidth() * static_cast<float>(i));
+		}
 	}
 	else
 	{
 		m_Bird.RefreshPosition();
+		for (const auto& pipe : m_Pipes)
+		{
+			pipe->RefreshPosition();
+		}
 	}
 
-	CropScreen();
+	//CropScreen();
 }
 
 void Game::CropScreen() const
@@ -150,7 +188,7 @@ void Game::CropScreen() const
 		x = static_cast<int>(ceilf(m_BackgroundSprite.GetPosition().x));
 
 		// Do the opposite for the width, to prevent the background color from showing
-		width = static_cast<int>(floorf(m_BackgroundSprite.GetWidth()));
+		width = static_cast<int>(floorf(m_BackgroundSprite.GetScaledWidth()));
 	}
 	else
 	{
@@ -158,7 +196,7 @@ void Game::CropScreen() const
 		x = static_cast<int>(floorf(m_BackgroundSprite.GetPosition().x));
 
 		// Do the opposite for the width, to prevent the background color from showing
-		width = static_cast<int>(ceilf(m_BackgroundSprite.GetWidth()));
+		width = static_cast<int>(ceilf(m_BackgroundSprite.GetScaledWidth()));
 	}
 
 	BeginScissorMode
@@ -166,7 +204,7 @@ void Game::CropScreen() const
 		x,
 		static_cast<int>(m_BackgroundSprite.GetPosition().y),
 		width,
-		static_cast<int>(m_BackgroundSprite.GetHeight())
+		static_cast<int>(m_BackgroundSprite.GetScaledHeight())
 	);
 }
 
@@ -185,16 +223,12 @@ void Game::SelectRandomBackground()
 void Game::MoveGround(float elapsedSec, const float speed)
 {
 	// Move the ground sprite source rectangle to the left
-	const float offset{ m_GroundSprite.GetWidth() - m_BackgroundSprite.GetWidth() };
-	Vector2 pos{ m_GroundSprite.GetPosition() };
-	pos.x -= speed * elapsedSec;
-
-	m_GroundSprite.SetPosition(pos);
+	const float offset{ m_GroundSprite.GetScaledWidth() - m_BackgroundSprite.GetScaledWidth() };
+	m_GroundSprite.AddPosX(-speed * elapsedSec);
 
 	if (m_GroundSprite.GetPosition().x < m_BackgroundSprite.GetPosition().x - offset)
 	{
 		// If the ground sprite is completely off screen, move it to the right of the screen
-		pos.x += offset;
-		m_GroundSprite.SetPosition(pos);
+		m_GroundSprite.SetPosition({ m_GroundSprite.GetPosition().x + offset, m_GroundSprite.GetPosition().y });
 	}
 }

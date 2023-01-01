@@ -1,8 +1,6 @@
 #include "bird.h"
 #include "constants.h"
 
-#include <iostream>
-
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
 {
@@ -56,7 +54,7 @@ void Bird::SelectRandomBird()
 	);
 }
 
-void Bird::Reset()
+void Bird::Initialize()
 {
 	m_BirdSprite.CenterOnScreen();
 

@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "bird.h"
+#include "pipe.h"
 
 class Game final
 {
@@ -22,16 +23,18 @@ public:
 	void OnWindowResize();
 
 	void ToggleFps();
-	static const Texture2D* GetSpriteSheet() { return s_pSpriteSheet; }
 
+	static const Texture2D* GetSpriteSheet() { return s_pSpriteSheet; }
+	static const Rectangle& GetGameScreenRect() { return s_GameScreenRect; }
 private:
 	bool m_StartGame{ false };
 	bool m_GameOver{ false };
 
-	static const Texture2D* s_pSpriteSheet;
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
 	Bird m_Bird{};
+
+	std::vector<Pipe*> m_Pipes;
 
 	// Fps values
 	bool m_ShowFps{ false };
@@ -45,6 +48,9 @@ private:
 
 	void HandleInput();
 	void HandleCollision();
+
+	static const Texture2D* s_pSpriteSheet;
+	static Rectangle s_GameScreenRect;
 };
 
 #endif

@@ -167,8 +167,8 @@ xcopy "$(SolutionDir)..\lib\vld\64-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" 
     <ClCompile Include="animation.cpp" />
     <ClCompile Include="bird.cpp" />
     <ClCompile Include="game.cpp" />
-    <ClCompile Include="gameObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="pipe.cpp" />
     <ClCompile Include="sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -176,7 +176,7 @@ xcopy "$(SolutionDir)..\lib\vld\64-bit\Microsoft.DTfW.DHL.manifest" "$(OutDir)" 
     <ClInclude Include="bird.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="game.h" />
-    <ClInclude Include="gameObject.h" />
+    <ClInclude Include="pipe.h" />
     <ClInclude Include="sprite.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -26,12 +26,12 @@ public:
 
 	// Setters
 	void SelectRandomBird();
-	void Reset();
+	void Initialize();
 	void RefreshPosition();
 
 	// Getters
 	const Vector2& GetPosition() const { return m_BirdSprite.GetPosition(); }
-	float GetHeight() const { return m_BirdSprite.GetHeight(); }
+	float GetScaledHeight() const { return m_BirdSprite.GetScaledHeight(); }
 
 private:
 	const Vector2 m_Offset{ -28.f, -1.f };
