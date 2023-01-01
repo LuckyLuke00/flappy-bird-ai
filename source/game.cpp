@@ -2,10 +2,7 @@
 #include "raymath.h"
 
 #include "game.h"
-
 #include "constants.h"
-
-#include <iostream>
 
 const Texture2D* Game::s_pSpriteSheet{ nullptr };
 
@@ -28,7 +25,13 @@ void Game::Update(float elapsedSec)
 {
 	HandleInput();
 
-	if (m_GameOver) return;
+	if (m_GameOver)
+	{
+		// Keep rotating the bird when the game is over, so the bird will always face downwards
+		m_Bird.RotateBird(elapsedSec);
+		return;
+	}
+
 	MoveGround(elapsedSec, 250.f);
 	m_Bird.UpdateAnimation(elapsedSec);
 
@@ -88,9 +91,12 @@ void Game::HandleInput()
 		ToggleFps();
 	}
 
+	if (m_GameOver) return;
+
 	// Flap the bird
 	if (IsKeyPressed(KEY_SPACE))
 	{
+		// Start the game on the first flap
 		m_StartGame = true;
 		m_Bird.Flap();
 	}
@@ -117,7 +123,15 @@ void Game::ConfigureGameScreen()
 
 	// Set the ground sprite to the bottom of the screen
 	m_GroundSprite.SetPosition({ m_BackgroundSprite.GetPosition().x, static_cast<float>(GetScreenHeight()) - m_GroundSprite.GetHeight() });
-	m_Bird.Reset();
+
+	if (!m_StartGame)
+	{
+		m_Bird.Reset();
+	}
+	else
+	{
+		m_Bird.RefreshPosition();
+	}
 
 	CropScreen();
 }

@@ -20,20 +20,24 @@ public:
 	void Update(float elapsedSec);
 	void UpdateAnimation(float elapsedSec);
 
+	// Function that rotates the bird sprite
+	void RotateBird(float elapsedSec);
 	void Flap();
 
 	// Setters
 	void SelectRandomBird();
 	void Reset();
+	void RefreshPosition();
 
 	// Getters
 	const Vector2& GetPosition() const { return m_BirdSprite.GetPosition(); }
-	const float GetHeight() const { return m_BirdSprite.GetHeight(); }
+	float GetHeight() const { return m_BirdSprite.GetHeight(); }
 
 private:
-	float m_VerticalSpeed{ .0f };
 	float m_FlapStartPos{ .0f };
+	float m_VerticalSpeed{ .0f };
 	Sprite m_BirdSprite{ { 3.f, 491.f, 17.f, 12.f } };
+	Vector2 m_PosPercent{ .0f, .0f };
 
 	// Animation
 	const std::vector<Vector2> m_BirdAnimationFrames
@@ -52,9 +56,6 @@ private:
 	// Function that checks if the bird is out of the top of the screen
 	bool IsOutOfBounds() const;
 	bool IsFalling() const;
-
-	// Function that rotates the bird sprite
-	void RotateBird(float elapsedSec);
 };
 
 #endif

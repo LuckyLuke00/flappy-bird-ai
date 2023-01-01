@@ -2,9 +2,9 @@
 #define CONSTANTS_H
 
 // Bird constants
-constexpr float FLAP_FORCE{ 600.f };
-constexpr float GRAVITY{ 2000.f };
-constexpr float MAX_FALL_SPEED{ 2500.f };
+constexpr float FLAP_FORCE{ 150.f };
+constexpr float GRAVITY{ 500.f };
+constexpr float MAX_FALL_SPEED{ 250.f };
 constexpr float ROTATION_SPEED_UP{ 600.f };
 constexpr float ROTATION_SPEED_DOWN{ 480.f };
 constexpr float MAX_UPWARD_ROTATION{ 20.f };

@@ -1,6 +1,8 @@
 #include "bird.h"
 #include "constants.h"
 
+#include <iostream>
+
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
 {
@@ -10,6 +12,9 @@ Bird::Bird()
 
 void Bird::Update(float elapsedSec)
 {
+	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
+	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
+
 	// Apply gravity
 	m_VerticalSpeed += GRAVITY * elapsedSec;
 
@@ -20,7 +25,7 @@ void Bird::Update(float elapsedSec)
 	}
 
 	// Update the position
-	m_BirdSprite.SetPosY(m_BirdSprite.GetPosition().y + m_VerticalSpeed * elapsedSec);
+	m_BirdSprite.AddPosY(m_VerticalSpeed * elapsedSec);
 
 	RotateBird(elapsedSec);
 }
@@ -39,7 +44,7 @@ void Bird::Flap()
 {
 	if (IsOutOfBounds()) return;
 
-	m_FlapStartPos = m_BirdSprite.GetPosition().y;
+	m_FlapStartPos = static_cast<float>(GetScreenHeight()) * m_PosPercent.y;
 	m_VerticalSpeed = -FLAP_FORCE;
 }
 
@@ -53,20 +58,36 @@ void Bird::SelectRandomBird()
 
 void Bird::Reset()
 {
+	m_BirdSprite.SetScale({ 1.f, 1.f });
+
 	m_BirdSprite.CenterOnScreen();
+
+	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
+	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
+
+	// Store the current position of the bird as percentages of the screen dimensions
+
+	//m_BirdSprite.AddPosX(-64.f);
+
 	m_BirdAnimation.Stop();
 	m_BirdAnimation.Play();
+}
+
+void Bird::RefreshPosition()
+{
+	// Update the position of the bird based on the new screen dimensions
+	m_BirdSprite.SetPosition({ static_cast<float>(GetScreenWidth()) * m_PosPercent.x, static_cast<float>(GetScreenHeight()) * m_PosPercent.y });
 }
 
 bool Bird::IsOutOfBounds() const
 {
 	// Check if the bird is out of the top of the screen
-	return m_BirdSprite.GetPosition().y < .0f;
+	return static_cast<float>(GetScreenHeight()) * m_PosPercent.y < .0f;
 }
 
 bool Bird::IsFalling() const
 {
-	return (m_BirdSprite.GetPosition().y > m_FlapStartPos);
+	return (static_cast<float>(GetScreenHeight()) * m_PosPercent.y > m_FlapStartPos);
 }
 
 void Bird::RotateBird(float elapsedSec)

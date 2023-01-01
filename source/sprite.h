@@ -22,6 +22,8 @@ public:
 
 	void CenterOnScreen();
 
+	void ScalePosition(const Vector2& scale);
+
 	void Rotate(const float degrees);
 
 	// Getters
@@ -35,9 +37,10 @@ public:
 	static const Vector2& GetGlobalScale() { return s_GlobalScale; }
 
 	// Setters
+	void AddPosX(const float x) { m_Position.x += x * (s_GlobalScale.x); }
+	void AddPosY(const float y) { m_Position.y += y * (s_GlobalScale.y); }
+
 	void SetPosition(const Vector2& pos) { m_Position = pos; }
-	void SetPosX(const float x) { m_Position.x = x; }
-	void SetPosY(const float y) { m_Position.y = y; }
 	void SetRotation(const float degrees) { m_Rotation = degrees; }
 	void SetScale(const Vector2& scale) { m_Scale = scale; }
 	void SetSrcRectPos(const float x, const float y) { m_SrcRect.x = x; m_SrcRect.y = y; }

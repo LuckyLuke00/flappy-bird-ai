@@ -18,8 +18,8 @@ void Animation::Update(float elapsedSec)
 	// Return if animation is not playing or frame timer is already greater than frame duration.
 	if (!m_IsPlaying || m_FrameTimer >= m_FrameDuration) return;
 
-	// Update frame timer.
-	m_FrameTimer += elapsedSec;
+	// Update frame timer, and prevent it from exceeding the frame duration.
+	m_FrameTimer += std::min(elapsedSec, m_FrameDuration);
 
 	// Calculate number of frames to advance based on elapsed time and frame duration.
 	AdvanceFrames(static_cast<int>(m_FrameTimer / m_FrameDuration));
