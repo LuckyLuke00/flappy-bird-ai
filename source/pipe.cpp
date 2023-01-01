@@ -15,6 +15,8 @@ void Pipe::Update(float elapsedSec)
 	// Move both pipes to the left
 	m_TopPipeSprite.AddPosX(-MOVE_SPEED * elapsedSec);
 	m_BottomPipeSprite.AddPosX(-MOVE_SPEED * elapsedSec);
+
+	UpdateHitBoxes();
 }
 
 void Pipe::Initialize(const float offsetX)
@@ -81,4 +83,19 @@ void Pipe::AddVerticalGap()
 	// Add a vertical gap between the pipes
 	m_TopPipeSprite.AddPosY(-PIPE_VERTICAL_GAP * .5f);
 	m_BottomPipeSprite.AddPosY(PIPE_VERTICAL_GAP * .5f);
+}
+
+void Pipe::UpdateHitBoxes()
+{
+	// Top pipe
+	m_HitBoxTop.x = m_TopPipeSprite.GetPosition().x;
+	m_HitBoxTop.y = m_TopPipeSprite.GetPosition().y;
+	m_HitBoxTop.width = m_TopPipeSprite.GetScaledWidth();
+	m_HitBoxTop.height = m_TopPipeSprite.GetScaledHeight();
+
+	// Bottom pipe
+	m_HitBoxBottom.x = m_BottomPipeSprite.GetPosition().x;
+	m_HitBoxBottom.y = m_BottomPipeSprite.GetPosition().y;
+	m_HitBoxBottom.width = m_BottomPipeSprite.GetScaledWidth();
+	m_HitBoxBottom.height = m_BottomPipeSprite.GetScaledHeight();
 }

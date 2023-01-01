@@ -32,10 +32,13 @@ void Game::Update(float elapsedSec)
 {
 	HandleInput();
 
+	if (m_IsOnGround) return;
+
 	if (m_GameOver)
 	{
 		// Keep rotating the bird when the game is over, so the bird will always face downwards
-		m_Bird.RotateBird(elapsedSec);
+		HandleCollision();
+		m_Bird.Update(elapsedSec);
 		return;
 	}
 
@@ -44,7 +47,6 @@ void Game::Update(float elapsedSec)
 
 	// Game started
 	if (!m_StartGame) return;
-
 	m_Bird.Update(elapsedSec);
 
 	for (int i{ 0 }; i < MAX_PIPES; ++i)
@@ -132,10 +134,24 @@ void Game::HandleInput()
 
 void Game::HandleCollision()
 {
-	// Check if the bird has collided with the ground
+	if (m_IsOnGround) return;
+
 	if (m_Bird.GetPosition().y + m_Bird.GetScaledHeight() >= m_GroundSprite.GetPosition().y)
 	{
 		m_GameOver = true;
+		m_IsOnGround = true;
+		return;
+	}
+
+	// Check collision with pipes
+	for (const auto& pipe : m_Pipes)
+	{
+		if (CheckCollisionCircleRec(m_Bird.GetHitCircleCenter(), m_Bird.GetHitCircleRadius(), pipe->GetHitBoxTop()) ||
+			CheckCollisionCircleRec(m_Bird.GetHitCircleCenter(), m_Bird.GetHitCircleRadius(), pipe->GetHitBoxBottom()))
+		{
+			m_GameOver = true;
+			return;
+		}
 	}
 }
 
@@ -171,7 +187,7 @@ void Game::ConfigureGameScreen()
 		}
 	}
 
-	//CropScreen();
+	CropScreen();
 }
 
 void Game::CropScreen() const

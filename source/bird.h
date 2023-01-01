@@ -31,10 +31,13 @@ public:
 
 	// Getters
 	const Vector2& GetPosition() const { return m_BirdSprite.GetPosition(); }
+	float GetHitCircleRadius() const { return m_Radius * Sprite::GetGlobalScale().y; }
 	float GetScaledHeight() const { return m_BirdSprite.GetScaledHeight(); }
+	Vector2 GetHitCircleCenter() const { return m_BirdSprite.GetCenter(); }
 
 private:
 	const Vector2 m_Offset{ -28.f, -1.f };
+	float m_Radius{ 6.f };
 	float m_FlapStartPos{ .0f };
 	float m_VerticalSpeed{ .0f };
 	Sprite m_BirdSprite{ { 3.f, 491.f, 17.f, 12.f } };

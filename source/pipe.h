@@ -20,6 +20,8 @@ public:
 	// Getters
 	const Vector2& GetPosition() const { return m_BottomPipeSprite.GetPosition(); }
 	float GetWidth() const { return m_BottomPipeSprite.GetWidth(); }
+	const Rectangle& GetHitBoxBottom() const { return m_HitBoxBottom; }
+	const Rectangle& GetHitBoxTop() const { return m_HitBoxTop; }
 
 	// Setters
 	void SetPosX(const float x) { m_BottomPipeSprite.SetPosX(x); m_TopPipeSprite.SetPosX(x); UpdatePosPercent(); }
@@ -31,6 +33,9 @@ public:
 	bool IsOffScreen() const;
 	void RefreshPosition();
 private:
+	Rectangle m_HitBoxTop{};
+	Rectangle m_HitBoxBottom{};
+
 	float m_PosPercentX{ .0f };
 	float m_PosPercentYTop{ .0f };
 	float m_PosPercentYBottom{ .0f };
@@ -44,4 +49,5 @@ private:
 	// Function that sets the pipes to the right of the screen
 	void SetToRightOfScreen();
 	void AddVerticalGap();
+	void UpdateHitBoxes();
 };
