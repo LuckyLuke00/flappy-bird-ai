@@ -22,8 +22,6 @@ public:
 
 	void CenterOnScreen();
 
-	void ScalePosition(const Vector2& scale);
-
 	void Rotate(const float degrees);
 
 	// Getters

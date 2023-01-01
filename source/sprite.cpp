@@ -1,7 +1,5 @@
 #include "sprite.h"
-#include "Game.h"
-
-#include <iostream>
+#include "game.h"
 
 Vector2 Sprite::s_GlobalScale{ 1.f, 1.f };
 
@@ -36,8 +34,6 @@ void Sprite::Draw() const
 		m_Rotation,
 		WHITE
 	);
-	const Vector2 pos{ m_Position.x + ((m_Position.x * s_GlobalScale.x) - m_Position.x), m_Position.y + ((m_Position.y * s_GlobalScale.y) - m_Position.y) };
-	DrawCircleV(pos, 4, RED);
 }
 
 void Sprite::FitScreenHeight()
@@ -59,14 +55,6 @@ void Sprite::CenterOnScreen()
 	// Centers the sprite on the screen (Unscaled)
 	m_Position.x = static_cast<float>(GetScreenWidth()) * .5f - (m_SrcRect.width * s_GlobalScale.x) * .5f;
 	m_Position.y = static_cast<float>(GetScreenHeight()) * .5f - (m_SrcRect.height * s_GlobalScale.y) * .5f;
-}
-
-void Sprite::ScalePosition(const Vector2& scale)
-{
-	// Scales the position of the sprite.
-	// Used for keeping the same relative position when resizing the window.
-	m_Position.x *= scale.x;
-	m_Position.y *= scale.y;
 }
 
 void Sprite::Rotate(const float degrees)

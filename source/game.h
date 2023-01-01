@@ -25,8 +25,6 @@ public:
 	static const Texture2D* GetSpriteSheet() { return s_pSpriteSheet; }
 
 private:
-	Vector2 m_PreviousScale{ 1.f, 1.f };
-
 	bool m_StartGame{ false };
 	bool m_GameOver{ false };
 

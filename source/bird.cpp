@@ -58,16 +58,14 @@ void Bird::SelectRandomBird()
 
 void Bird::Reset()
 {
-	m_BirdSprite.SetScale({ 1.f, 1.f });
-
 	m_BirdSprite.CenterOnScreen();
+
+	// Add an offset
+	m_BirdSprite.AddPosX(m_Offset.x);
+	m_BirdSprite.AddPosY(m_Offset.y);
 
 	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
 	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
-
-	// Store the current position of the bird as percentages of the screen dimensions
-
-	//m_BirdSprite.AddPosX(-64.f);
 
 	m_BirdAnimation.Stop();
 	m_BirdAnimation.Play();
