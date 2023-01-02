@@ -50,6 +50,7 @@ private:
 
 	void HandleInput();
 	void HandleCollision();
+	void RestartGame();
 
 	static const Texture2D* s_pSpriteSheet;
 	static Rectangle s_GameScreenRect;

@@ -44,10 +44,13 @@ public:
 	void SetSrcRectPos(const float x, const float y) { m_SrcRect.x = x; m_SrcRect.y = y; }
 	void SetSrcRectPos(const Vector2& pos) { m_SrcRect.x = pos.x; m_SrcRect.y = pos.y; }
 
+	void ResetSrcRect() { m_SrcRect = m_InitialSrcRect; }
+
 	static void SetGlobalScale(const Vector2& scale) { s_GlobalScale = scale; }
 
 private:
 	float m_Rotation;
+	const Rectangle m_InitialSrcRect;
 
 	Rectangle m_SrcRect;
 

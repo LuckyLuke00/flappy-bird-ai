@@ -143,6 +143,11 @@ void Game::HandleInput()
 		ToggleFps();
 	}
 
+	if (IsKeyPressed(KEY_R))
+	{
+		RestartGame();
+	}
+
 	if (m_GameOver) return;
 
 	// Flap the bird
@@ -175,6 +180,23 @@ void Game::HandleCollision()
 			return;
 		}
 	}
+}
+
+void Game::RestartGame()
+{
+	m_BackgroundSprite.ResetSrcRect();
+	SelectRandomBackground();
+	m_Bird.Initialize();
+
+	for (int i{ 0 }; i < MAX_PIPES; ++i)
+	{
+		m_Pipes[i]->Initialize(PIPE_HORIZONTAL_GAP * static_cast<float>(i) + m_Pipes[i]->GetWidth() * static_cast<float>(i));
+	}
+
+	m_Score = 0;
+	m_StartGame = false;
+	m_GameOver = false;
+	m_IsOnGround = false;
 }
 
 void Game::ConfigureGameScreen()

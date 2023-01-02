@@ -4,8 +4,6 @@
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
 {
-	SelectRandomBird();
-	m_BirdAnimation.Play();
 }
 
 void Bird::Update(float elapsedSec)
@@ -50,12 +48,15 @@ void Bird::SelectRandomBird()
 {
 	m_BirdAnimation.SetFrameStart
 	(
-		GetRandomValue(0, static_cast<int>(m_BirdAnimationFrames.size() / m_AnimFrames)) * m_AnimFrames
+		GetRandomValue(0, (static_cast<int>(m_BirdAnimationFrames.size() / m_AnimFrames)) - 1) * m_AnimFrames
 	);
 }
 
 void Bird::Initialize()
 {
+	SelectRandomBird();
+
+	m_BirdSprite.SetRotation(0.f);
 	m_BirdSprite.CenterOnScreen();
 
 	// Add an offset

@@ -51,7 +51,7 @@ bool Animation::CheckBounds()
 	// Check if the frame start is within bounds.
 	if (m_FrameStart < 0 || m_FrameStart >= static_cast<int>(m_FrameCoords.size()))
 	{
-		std::cerr << "WARNING: Frame start is out of bounds.\n";
+		std::cerr << "WARNING: Frame start is out of bounds. m_FrameStart was: " << m_FrameStart << '\n';
 
 		m_FrameStart = 0;
 

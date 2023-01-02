@@ -6,7 +6,8 @@ Vector2 Sprite::s_GlobalScale{ 1.f, 1.f };
 Sprite::Sprite(const Rectangle& srcRect, const Vector2& pos, const float rotation)
 	: m_Rotation{ rotation },
 	m_SrcRect{ srcRect },
-	m_Position{ pos }
+	m_Position{ pos },
+	m_InitialSrcRect{ srcRect }
 {
 }
 
