@@ -32,7 +32,11 @@ void Game::Update(float elapsedSec)
 {
 	HandleInput();
 
-	if (m_IsOnGround) return;
+	if (m_IsOnGround)
+	{
+		m_Bird.RotateBird(elapsedSec);
+		return;
+	}
 
 	if (m_GameOver)
 	{
@@ -52,6 +56,12 @@ void Game::Update(float elapsedSec)
 	for (int i{ 0 }; i < MAX_PIPES; ++i)
 	{
 		m_Pipes[i]->Update(elapsedSec);
+
+		if (m_Pipes[i]->HasPassed(m_Bird.GetHitCircleCenter()))
+		{
+			++m_Score;
+		}
+
 		if (m_Pipes[i]->IsOffScreen())
 		{
 			// Set the pipe position to the position of the pipe with index - 1
@@ -86,6 +96,18 @@ void Game::Draw() const
 		constexpr int fontSize{ 20 };
 		DrawText(TextFormat("FPS: %i", GetFPS()), static_cast<int>(m_BackgroundSprite.GetPosition().x + padding), padding, fontSize, BLACK);
 	}
+
+	// Draw the score in the middle of the screen
+	if (m_StartGame)
+	{
+		const int fontSize{ static_cast<int>(15.f * Sprite::GetGlobalScale().x) };
+		const int scoreWidth{ MeasureText(TextFormat("%i", m_Score), fontSize) };
+		DrawText(TextFormat("%i", m_Score), GetScreenWidth() / 2 - scoreWidth / 2, GetScreenHeight() / 6 - fontSize / 2, fontSize, BLACK);
+	}
+
+	//// Draw two debug lines in the center of the screen
+	//DrawLine(0, GetScreenHeight() / 2, GetScreenWidth(), GetScreenHeight() / 2, RED);
+	//DrawLine(GetScreenWidth() / 2, 0, GetScreenWidth() / 2, GetScreenHeight(), RED);
 
 	EndDrawing();
 }

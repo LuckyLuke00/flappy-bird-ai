@@ -31,6 +31,7 @@ public:
 
 	void Initialize(const float offsetX);
 	bool IsOffScreen() const;
+	bool HasPassed(const Vector2& birdPos);
 	void RefreshPosition();
 private:
 	Rectangle m_HitBoxTop{};
@@ -39,6 +40,7 @@ private:
 	float m_PosPercentX{ .0f };
 	float m_PosPercentYTop{ .0f };
 	float m_PosPercentYBottom{ .0f };
+	bool m_Passed{ false };
 
 	Sprite m_TopPipeSprite{ { 56.f, 323.f, 26.f, 160.f } };
 	Sprite m_BottomPipeSprite{ { 84.f, 323.f, 26.f, 160.f } };

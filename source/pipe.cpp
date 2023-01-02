@@ -27,6 +27,8 @@ void Pipe::Initialize(const float offsetX)
 	m_TopPipeSprite.AddPosX(GAME_WIDTH + offsetX);
 	m_BottomPipeSprite.AddPosX(GAME_WIDTH + offsetX);
 
+	m_Passed = false;
+
 	AddVerticalGap();
 
 	SetRandomHeight();
@@ -35,7 +37,21 @@ void Pipe::Initialize(const float offsetX)
 
 bool Pipe::IsOffScreen() const
 {
-	return  static_cast<float>(GetScreenWidth()) * m_PosPercentX + m_TopPipeSprite.GetScaledWidth() < Game::GetGameScreenRect().x;
+	return static_cast<float>(GetScreenWidth()) * m_PosPercentX + m_TopPipeSprite.GetScaledWidth() < Game::GetGameScreenRect().x;
+}
+
+bool Pipe::HasPassed(const Vector2& birdPos)
+{
+	if (birdPos.x < static_cast<float>(GetScreenWidth()) * m_PosPercentX + m_TopPipeSprite.GetScaledWidth() * .5f)
+	{
+		m_Passed = false;
+		return m_Passed;
+	}
+
+	if (m_Passed) return false;
+
+	m_Passed = true;
+	return m_Passed;
 }
 
 void Pipe::RefreshPosition()
@@ -48,7 +64,7 @@ void Pipe::SetRandomHeight()
 {
 	// Set a random height for the top pipe
 	// TODO: Take ground height into account (dynamically)
-	const float randomHeight{ static_cast<float>(GetRandomValue(-MAX_PIPE_HEIGHT / 2, MAX_PIPE_HEIGHT / 2)) - 56 / 2 };
+	const float randomHeight{ static_cast<float>(GetRandomValue(-MAX_PIPE_HEIGHT / 2, MAX_PIPE_HEIGHT / 2)) - 56 };
 
 	// Set the height of the top pipe
 	m_TopPipeSprite.AddPosY(randomHeight * .5f);

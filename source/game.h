@@ -30,6 +30,7 @@ private:
 	bool m_StartGame{ false };
 	bool m_GameOver{ false };
 	bool m_IsOnGround{ false };
+	int m_Score{ 0 };
 
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };

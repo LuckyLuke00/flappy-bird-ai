@@ -37,7 +37,7 @@ public:
 
 private:
 	const Vector2 m_Offset{ -28.f, -1.f };
-	float m_Radius{ 6.f };
+	float m_Radius{ 5.f };
 	float m_FlapStartPos{ .0f };
 	float m_VerticalSpeed{ .0f };
 	Sprite m_BirdSprite{ { 3.f, 491.f, 17.f, 12.f } };
