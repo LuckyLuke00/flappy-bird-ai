@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PIPE_H
+#define PIPE_H
 
 #include "sprite.h"
 
@@ -53,3 +54,5 @@ private:
 	void AddVerticalGap();
 	void UpdateHitBoxes();
 };
+
+#endif
