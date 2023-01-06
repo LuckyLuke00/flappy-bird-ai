@@ -1,5 +1,6 @@
 #include "bird.h"
 #include "constants.h"
+#include "game.h"
 
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
@@ -10,6 +11,18 @@ void Bird::Update(float elapsedSec)
 {
 	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
 	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
+
+	if (!Game::IsGameOver() && IsDead())
+	{
+		m_BirdSprite.AddPosX(-MOVE_SPEED * elapsedSec);
+	}
+
+	if (IsOnGround())
+	{
+		m_Dead = true;
+		RotateBird(elapsedSec);
+		return;
+	}
 
 	// Apply gravity
 	m_VerticalSpeed += GRAVITY * elapsedSec;
@@ -29,16 +42,25 @@ void Bird::Update(float elapsedSec)
 void Bird::Draw() const
 {
 	m_BirdSprite.Draw();
+
+	// Draw a line
+	DrawLineEx({ GetHitCircleCenter().x, GetHitCircleCenter().y }, { GetHitCircleCenter().x, GetHitCircleCenter().y - m_BirdPipeDelta }, 2.f, RED);
 }
 
 void Bird::UpdateAnimation(float elapsedSec)
 {
+	if (IsDead()) return;
 	m_BirdAnimation.Update(elapsedSec);
+}
+
+void Bird::CalculateBirdPipeHeightDelta(const Vector2& pipeCenter)
+{
+	m_BirdPipeDelta = m_BirdSprite.GetPosition().y + m_BirdSprite.GetScaledHeight() - pipeCenter.y;
 }
 
 void Bird::Flap()
 {
-	if (IsOutOfBounds()) return;
+	if (m_Dead || IsOutOfBounds()) return;
 
 	m_FlapStartPos = static_cast<float>(GetScreenHeight()) * m_PosPercent.y;
 	m_VerticalSpeed = -FLAP_FORCE;
@@ -56,12 +78,18 @@ void Bird::Initialize()
 {
 	SelectRandomBird();
 
+	m_Dead = false;
+
+	static float birdStartPosY{ .0f };
+
 	m_BirdSprite.SetRotation(0.f);
 	m_BirdSprite.CenterOnScreen();
 
 	// Add an offset
 	m_BirdSprite.AddPosX(m_Offset.x);
-	m_BirdSprite.AddPosY(m_Offset.y);
+	m_BirdSprite.AddPosY(m_Offset.y + birdStartPosY);
+
+	birdStartPosY -= 20.f;
 
 	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
 	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
@@ -80,6 +108,11 @@ bool Bird::IsOutOfBounds() const
 {
 	// Check if the bird is out of the top of the screen
 	return static_cast<float>(GetScreenHeight()) * m_PosPercent.y < .0f;
+}
+
+bool Bird::IsOnGround() const
+{
+	return m_BirdSprite.GetPosition().y + m_BirdSprite.GetScaledHeight() > static_cast<float>(GetScreenHeight()) - Game::GetGroundHeight() * Sprite::GetGlobalScale().x;
 }
 
 bool Bird::IsFalling() const

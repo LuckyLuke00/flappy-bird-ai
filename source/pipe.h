@@ -26,8 +26,6 @@ public:
 	Vector2 GetPipeGapCenter() const;
 
 	// Setters
-	static void SetGroundHeight(const float groundHeight) { s_GroundHeight = groundHeight; }
-
 	void AddPosX(const float x) { m_BottomPipeSprite.AddPosX(x); m_TopPipeSprite.AddPosX(x); UpdatePosPercent(); }
 	void AddPosY(const float y) { m_BottomPipeSprite.AddPosY(y); m_TopPipeSprite.AddPosY(y); UpdatePosPercent(); }
 	void SetPosX(const float x) { m_BottomPipeSprite.SetPosX(x); m_TopPipeSprite.SetPosX(x); UpdatePosPercent(); }
@@ -37,9 +35,8 @@ public:
 	bool IsOffScreen() const;
 	bool HasPassed(const Vector2& birdPos);
 	void RefreshPosition();
-private:
-	static float s_GroundHeight;
 
+private:
 	Rectangle m_HitBoxTop{};
 	Rectangle m_HitBoxBottom{};
 

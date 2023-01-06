@@ -26,9 +26,12 @@ public:
 
 	static const Texture2D* GetSpriteSheet() { return s_pSpriteSheet; }
 	static const Rectangle& GetGameScreenRect() { return s_GameScreenRect; }
+	static float GetGroundHeight() { return s_GroundHeight; }
+	static bool IsGameOver() { return s_GameOver; }
 private:
+	static bool s_GameOver;
+	static float s_GroundHeight;
 	bool m_StartGame{ false };
-	bool m_GameOver{ false };
 	bool m_IsOnGround{ false };
 	int m_Score{ 0 };
 	int m_ClosestPipeIdx{ 0 };
@@ -54,6 +57,7 @@ private:
 	void RestartGame();
 
 	int GetClosestPipeIdx() const;
+	bool AreAllBirdsDead() const;
 
 	static const Texture2D* s_pSpriteSheet;
 	static Rectangle s_GameScreenRect;

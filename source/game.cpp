@@ -4,7 +4,9 @@
 #include "game.h"
 #include "constants.h"
 
+bool Game::s_GameOver{ false };
 const Texture2D* Game::s_pSpriteSheet{ nullptr };
+float Game::s_GroundHeight{ .0f };
 Rectangle Game::s_GameScreenRect{ 0.f, 0.f, GAME_WIDTH, GAME_HEIGHT };
 
 Game::Game()
@@ -25,6 +27,8 @@ Game::Game()
 		m_Birds.emplace_back(new Bird{});
 	}
 
+	s_GroundHeight = m_GroundSprite.GetHeight();
+
 	ConfigureGameScreen();
 	SelectRandomBackground();
 }
@@ -38,19 +42,9 @@ void Game::Update(float elapsedSec)
 {
 	HandleInput();
 
-	if (m_IsOnGround)
+	if (AreAllBirdsDead())
 	{
-		for (const auto& bird : m_Birds)
-		{
-			bird->RotateBird(elapsedSec);
-		}
-		return;
-	}
-
-	if (m_GameOver)
-	{
-		// Keep rotating the bird when the game is over, so the bird will always face downwards
-		HandleCollision();
+		s_GameOver = true;
 		for (const auto& bird : m_Birds)
 		{
 			bird->Update(elapsedSec);
@@ -66,10 +60,6 @@ void Game::Update(float elapsedSec)
 
 	// Game started
 	if (!m_StartGame) return;
-	for (const auto& bird : m_Birds)
-	{
-		bird->Update(elapsedSec);
-	}
 
 	for (const auto& pipe : m_Pipes)
 	{
@@ -78,18 +68,23 @@ void Game::Update(float elapsedSec)
 
 	m_ClosestPipeIdx = GetClosestPipeIdx();
 
-	for (const auto& bird : m_Birds)
-	{
-		if (m_Pipes[m_ClosestPipeIdx]->HasPassed(bird->GetHitCircleCenter()))
-		{
-			++m_Score;
-		}
-	}
-
 	if (m_Pipes[m_ClosestPipeIdx]->IsOffScreen())
 	{
 		m_Pipes[m_ClosestPipeIdx]->SetPosX(m_Pipes[(m_ClosestPipeIdx - 1 + MAX_PIPES) % MAX_PIPES]->GetPosition().x);
 		m_Pipes[m_ClosestPipeIdx]->AddPosX(PIPE_HORIZONTAL_GAP + m_Pipes[m_ClosestPipeIdx]->GetWidth());
+	}
+
+	for (const auto& bird : m_Birds)
+	{
+		bird->Update(elapsedSec);
+		bird->CalculateBirdPipeHeightDelta(m_Pipes[m_ClosestPipeIdx]->GetPipeGapCenter());
+
+		if (bird->IsDead()) continue;
+
+		if (m_Pipes[m_ClosestPipeIdx]->HasPassed(bird->GetHitCircleCenter()))
+		{
+			++m_Score;
+		}
 	}
 
 	HandleCollision();
@@ -188,7 +183,7 @@ void Game::HandleInput()
 		RestartGame();
 	}
 
-	if (m_GameOver) return;
+	if (s_GameOver) return;
 
 	// Flap the bird
 	if (IsKeyPressed(KEY_SPACE))
@@ -208,22 +203,10 @@ void Game::HandleCollision()
 
 	for (const auto& bird : m_Birds)
 	{
-		if (bird->GetPosition().y + bird->GetScaledHeight() > m_GroundSprite.GetPosition().y)
-		{
-			m_GameOver = true;
-			m_IsOnGround = true;
-			return;
-		}
-	}
-
-	// Check collision with pipes
-	for (const auto& bird : m_Birds)
-	{
 		if (CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_Pipes[m_ClosestPipeIdx]->GetHitBoxTop()) ||
 			CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_Pipes[m_ClosestPipeIdx]->GetHitBoxBottom()))
 		{
-			m_GameOver = true;
-			return;
+			bird->SetDeath(true);
 		}
 	}
 }
@@ -244,7 +227,7 @@ void Game::RestartGame()
 
 	m_Score = 0;
 	m_StartGame = false;
-	m_GameOver = false;
+	s_GameOver = false;
 	m_IsOnGround = false;
 }
 
@@ -262,6 +245,15 @@ int Game::GetClosestPipeIdx() const
 	return closestPipeIdx;
 }
 
+bool Game::AreAllBirdsDead() const
+{
+	for (const auto& bird : m_Birds)
+	{
+		if (!bird->IsDead()) return false;
+	}
+	return true;
+}
+
 void Game::ConfigureGameScreen()
 {
 	// Calculate the global scale based on the screen size and the background sprite size, as the background
@@ -275,8 +267,6 @@ void Game::ConfigureGameScreen()
 
 	// Set the ground sprite to the bottom of the screen
 	m_GroundSprite.SetPosition({ m_BackgroundSprite.GetPosition().x, static_cast<float>(GetScreenHeight()) - m_GroundSprite.GetScaledHeight() });
-
-	Pipe::SetGroundHeight(m_GroundSprite.GetHeight());
 
 	if (!m_StartGame)
 	{
