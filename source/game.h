@@ -31,11 +31,12 @@ private:
 	bool m_GameOver{ false };
 	bool m_IsOnGround{ false };
 	int m_Score{ 0 };
+	int m_ClosestPipeIdx{ 0 };
 
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
-	Bird m_Bird{};
 
+	std::vector<Bird*> m_Birds{};
 	std::vector<Pipe*> m_Pipes;
 
 	// Fps values
@@ -51,6 +52,8 @@ private:
 	void HandleInput();
 	void HandleCollision();
 	void RestartGame();
+
+	int GetClosestPipeIdx() const;
 
 	static const Texture2D* s_pSpriteSheet;
 	static Rectangle s_GameScreenRect;

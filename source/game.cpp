@@ -19,6 +19,12 @@ Game::Game()
 		m_Pipes.emplace_back(new Pipe{});
 	}
 
+	m_Birds.reserve(MAX_BIRDS);
+	for (int i{ 0 }; i < MAX_BIRDS; ++i)
+	{
+		m_Birds.emplace_back(new Bird{});
+	}
+
 	ConfigureGameScreen();
 	SelectRandomBackground();
 }
@@ -34,7 +40,10 @@ void Game::Update(float elapsedSec)
 
 	if (m_IsOnGround)
 	{
-		m_Bird.RotateBird(elapsedSec);
+		for (const auto& bird : m_Birds)
+		{
+			bird->RotateBird(elapsedSec);
+		}
 		return;
 	}
 
@@ -42,33 +51,45 @@ void Game::Update(float elapsedSec)
 	{
 		// Keep rotating the bird when the game is over, so the bird will always face downwards
 		HandleCollision();
-		m_Bird.Update(elapsedSec);
+		for (const auto& bird : m_Birds)
+		{
+			bird->Update(elapsedSec);
+		}
 		return;
 	}
 
 	MoveGround(elapsedSec, MOVE_SPEED);
-	m_Bird.UpdateAnimation(elapsedSec);
+	for (auto& bird : m_Birds)
+	{
+		bird->UpdateAnimation(elapsedSec);
+	}
 
 	// Game started
 	if (!m_StartGame) return;
-	m_Bird.Update(elapsedSec);
-
-	for (int i{ 0 }; i < MAX_PIPES; ++i)
+	for (const auto& bird : m_Birds)
 	{
-		m_Pipes[i]->Update(elapsedSec);
+		bird->Update(elapsedSec);
+	}
 
-		if (m_Pipes[i]->HasPassed(m_Bird.GetHitCircleCenter()))
+	for (const auto& pipe : m_Pipes)
+	{
+		pipe->Update(elapsedSec);
+	}
+
+	m_ClosestPipeIdx = GetClosestPipeIdx();
+
+	for (const auto& bird : m_Birds)
+	{
+		if (m_Pipes[m_ClosestPipeIdx]->HasPassed(bird->GetHitCircleCenter()))
 		{
 			++m_Score;
 		}
+	}
 
-		if (m_Pipes[i]->IsOffScreen())
-		{
-			// Set the pipe position to the position of the pipe with index - 1
-			// But make sure it wraps around to the last pipe if the index is 0
-			m_Pipes[i]->SetPosX(m_Pipes[(i - 1 + MAX_PIPES) % MAX_PIPES]->GetPosition().x);
-			m_Pipes[i]->AddPosX(PIPE_HORIZONTAL_GAP + m_Pipes[i]->GetWidth());
-		}
+	if (m_Pipes[m_ClosestPipeIdx]->IsOffScreen())
+	{
+		m_Pipes[m_ClosestPipeIdx]->SetPosX(m_Pipes[(m_ClosestPipeIdx - 1 + MAX_PIPES) % MAX_PIPES]->GetPosition().x);
+		m_Pipes[m_ClosestPipeIdx]->AddPosX(PIPE_HORIZONTAL_GAP + m_Pipes[m_ClosestPipeIdx]->GetWidth());
 	}
 
 	HandleCollision();
@@ -86,15 +107,25 @@ void Game::Draw() const
 		pipe->Draw();
 	}
 
-	m_Bird.Draw();
+	for (const auto& bird : m_Birds)
+	{
+		bird->Draw();
+	}
 
 	m_GroundSprite.Draw(); // Draw last
 
 	if (m_ShowFps)
 	{
 		constexpr int padding{ 20 };
-		constexpr int fontSize{ 20 };
-		DrawText(TextFormat("FPS: %i", GetFPS()), static_cast<int>(m_BackgroundSprite.GetPosition().x + padding), padding, fontSize, BLACK);
+		const int fontSize{ static_cast<int>(5.f * Sprite::GetGlobalScale().x) };
+		DrawText
+		(
+			TextFormat("FPS: %i", GetFPS()),
+			static_cast<int>(m_BackgroundSprite.GetPosition().x + padding),
+			padding,
+			fontSize,
+			BLACK
+		);
 	}
 
 	// Draw the score in the middle of the screen
@@ -102,12 +133,15 @@ void Game::Draw() const
 	{
 		const int fontSize{ static_cast<int>(15.f * Sprite::GetGlobalScale().x) };
 		const int scoreWidth{ MeasureText(TextFormat("%i", m_Score), fontSize) };
-		DrawText(TextFormat("%i", m_Score), GetScreenWidth() / 2 - scoreWidth / 2, GetScreenHeight() / 6 - fontSize / 2, fontSize, BLACK);
+		DrawText
+		(
+			TextFormat("%i", m_Score),
+			GetScreenWidth() / 2 - scoreWidth / 2,
+			GetScreenHeight() / 6 - fontSize / 2,
+			fontSize,
+			BLACK
+		);
 	}
-
-	//// Draw two debug lines in the center of the screen
-	//DrawLine(0, GetScreenHeight() / 2, GetScreenWidth(), GetScreenHeight() / 2, RED);
-	//DrawLine(GetScreenWidth() / 2, 0, GetScreenWidth() / 2, GetScreenHeight(), RED);
 
 	EndDrawing();
 }
@@ -128,6 +162,12 @@ void Game::CleanUp()
 	{
 		delete pipe;
 		pipe = nullptr;
+	}
+
+	for (auto& bird : m_Birds)
+	{
+		delete bird;
+		bird = nullptr;
 	}
 
 	UnloadTexture(*s_pSpriteSheet);
@@ -155,7 +195,10 @@ void Game::HandleInput()
 	{
 		// Start the game on the first flap
 		m_StartGame = true;
-		m_Bird.Flap();
+		for (const auto& bird : m_Birds)
+		{
+			bird->Flap();
+		}
 	}
 }
 
@@ -163,18 +206,21 @@ void Game::HandleCollision()
 {
 	if (m_IsOnGround) return;
 
-	if (m_Bird.GetPosition().y + m_Bird.GetScaledHeight() >= m_GroundSprite.GetPosition().y)
+	for (const auto& bird : m_Birds)
 	{
-		m_GameOver = true;
-		m_IsOnGround = true;
-		return;
+		if (bird->GetPosition().y + bird->GetScaledHeight() > m_GroundSprite.GetPosition().y)
+		{
+			m_GameOver = true;
+			m_IsOnGround = true;
+			return;
+		}
 	}
 
 	// Check collision with pipes
-	for (const auto& pipe : m_Pipes)
+	for (const auto& bird : m_Birds)
 	{
-		if (CheckCollisionCircleRec(m_Bird.GetHitCircleCenter(), m_Bird.GetHitCircleRadius(), pipe->GetHitBoxTop()) ||
-			CheckCollisionCircleRec(m_Bird.GetHitCircleCenter(), m_Bird.GetHitCircleRadius(), pipe->GetHitBoxBottom()))
+		if (CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_Pipes[m_ClosestPipeIdx]->GetHitBoxTop()) ||
+			CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_Pipes[m_ClosestPipeIdx]->GetHitBoxBottom()))
 		{
 			m_GameOver = true;
 			return;
@@ -186,7 +232,10 @@ void Game::RestartGame()
 {
 	m_BackgroundSprite.ResetSrcRect();
 	SelectRandomBackground();
-	m_Bird.Initialize();
+	for (const auto& bird : m_Birds)
+	{
+		bird->Initialize();
+	}
 
 	for (int i{ 0 }; i < MAX_PIPES; ++i)
 	{
@@ -197,6 +246,20 @@ void Game::RestartGame()
 	m_StartGame = false;
 	m_GameOver = false;
 	m_IsOnGround = false;
+}
+
+int Game::GetClosestPipeIdx() const
+{
+	// Get the index of the closest pipe to the bird (smallest x value)
+	int closestPipeIdx{ 0 };
+	for (int i{ 0 }; i < MAX_PIPES; ++i)
+	{
+		if (m_Pipes[i]->GetPosition().x < m_Pipes[closestPipeIdx]->GetPosition().x)
+		{
+			closestPipeIdx = i;
+		}
+	}
+	return closestPipeIdx;
 }
 
 void Game::ConfigureGameScreen()
@@ -213,9 +276,14 @@ void Game::ConfigureGameScreen()
 	// Set the ground sprite to the bottom of the screen
 	m_GroundSprite.SetPosition({ m_BackgroundSprite.GetPosition().x, static_cast<float>(GetScreenHeight()) - m_GroundSprite.GetScaledHeight() });
 
+	Pipe::SetGroundHeight(m_GroundSprite.GetHeight());
+
 	if (!m_StartGame)
 	{
-		m_Bird.Initialize();
+		for (const auto& bird : m_Birds)
+		{
+			bird->Initialize();
+		}
 
 		for (int i{ 0 }; i < MAX_PIPES; ++i)
 		{
@@ -224,7 +292,10 @@ void Game::ConfigureGameScreen()
 	}
 	else
 	{
-		m_Bird.RefreshPosition();
+		for (const auto& bird : m_Birds)
+		{
+			bird->RefreshPosition();
+		}
 		for (const auto& pipe : m_Pipes)
 		{
 			pipe->RefreshPosition();

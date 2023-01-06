@@ -2,10 +2,17 @@
 #include "game.h"
 #include "constants.h"
 
+float Pipe::s_GroundHeight{ .0f };
+
 void Pipe::Draw() const
 {
 	m_TopPipeSprite.Draw();
 	m_BottomPipeSprite.Draw();
+
+	//// DEBUG
+	//// Draw the gap center
+	//const Vector2 center{ GetPipeGapCenter() };
+	//DrawCircleV(center, 2.5f, RED);
 }
 
 void Pipe::Update(float elapsedSec)
@@ -17,6 +24,16 @@ void Pipe::Update(float elapsedSec)
 	m_BottomPipeSprite.AddPosX(-MOVE_SPEED * elapsedSec);
 
 	UpdateHitBoxes();
+}
+
+Vector2 Pipe::GetPipeGapCenter() const
+{
+	// Returns the center of the gap between the pipes
+	return Vector2
+	{
+		m_BottomPipeSprite.GetPosition().x + m_BottomPipeSprite.GetScaledWidth() * .5f,
+		m_BottomPipeSprite.GetPosition().y - PIPE_VERTICAL_GAP * Sprite::GetGlobalScale().x * .5f
+	};
 }
 
 void Pipe::Initialize(const float offsetX)
@@ -63,8 +80,7 @@ void Pipe::RefreshPosition()
 void Pipe::SetRandomHeight()
 {
 	// Set a random height for the top pipe
-	// TODO: Take ground height into account (dynamically)
-	const float randomHeight{ static_cast<float>(GetRandomValue(-MAX_PIPE_HEIGHT / 2, MAX_PIPE_HEIGHT / 2)) - 56 };
+	const float randomHeight{ static_cast<float>(GetRandomValue(-MAX_PIPE_HEIGHT / 2, MAX_PIPE_HEIGHT / 2)) - s_GroundHeight };
 
 	// Set the height of the top pipe
 	m_TopPipeSprite.AddPosY(randomHeight * .5f);
