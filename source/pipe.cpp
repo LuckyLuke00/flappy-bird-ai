@@ -6,11 +6,6 @@ void Pipe::Draw() const
 {
 	m_TopPipeSprite.Draw();
 	m_BottomPipeSprite.Draw();
-
-	//// DEBUG
-	//// Draw the gap center
-	//const Vector2 center{ GetPipeGapCenter() };
-	//DrawCircleV(center, 2.5f, RED);
 }
 
 void Pipe::Update(float elapsedSec)

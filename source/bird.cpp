@@ -2,6 +2,8 @@
 #include "constants.h"
 #include "game.h"
 
+#include <iostream>
+
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
 {
@@ -12,7 +14,7 @@ void Bird::Update(float elapsedSec)
 	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
 	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
 
-	if (!Game::IsGameOver() && IsDead())
+	if (!Game::IsGameOver() && m_Dead)
 	{
 		m_BirdSprite.AddPosX(-MOVE_SPEED * elapsedSec);
 	}
@@ -23,6 +25,13 @@ void Bird::Update(float elapsedSec)
 		RotateBird(elapsedSec);
 		return;
 	}
+
+	//// DEBUG
+	//// Let the bird play it self
+	//if (m_BirdPipeDelta > 35.f)
+	//{
+	//	Flap();
+	//}
 
 	// Apply gravity
 	m_VerticalSpeed += GRAVITY * elapsedSec;
@@ -43,8 +52,17 @@ void Bird::Draw() const
 {
 	m_BirdSprite.Draw();
 
-	// Draw a line
-	DrawLineEx({ GetHitCircleCenter().x, GetHitCircleCenter().y }, { GetHitCircleCenter().x, GetHitCircleCenter().y - m_BirdPipeDelta }, 2.f, RED);
+	//// DEBUG
+	//const Vector2& pos{ m_BirdSprite.GetPosition() };
+	//const Vector2& center{ m_BirdSprite.GetCenter() };
+	//DrawLine
+	//(
+	//	static_cast<int>(center.x),
+	//	static_cast<int>(pos.y),
+	//	static_cast<int>(center.x),
+	//	static_cast<int>(pos.y - m_BirdPipeDelta),
+	//	RED
+	//);
 }
 
 void Bird::UpdateAnimation(float elapsedSec)
@@ -80,16 +98,12 @@ void Bird::Initialize()
 
 	m_Dead = false;
 
-	static float birdStartPosY{ .0f };
-
 	m_BirdSprite.SetRotation(0.f);
 	m_BirdSprite.CenterOnScreen();
 
 	// Add an offset
 	m_BirdSprite.AddPosX(m_Offset.x);
-	m_BirdSprite.AddPosY(m_Offset.y + birdStartPosY);
-
-	birdStartPosY -= 20.f;
+	m_BirdSprite.AddPosY(m_Offset.y);
 
 	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
 	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());

@@ -21,6 +21,7 @@ public:
 	// Getters
 	const Vector2& GetPosition() const { return m_BottomPipeSprite.GetPosition(); }
 	float GetWidth() const { return m_BottomPipeSprite.GetWidth(); }
+	float GetScaledWidth() const { return m_BottomPipeSprite.GetScaledWidth(); }
 	const Rectangle& GetHitBoxBottom() const { return m_HitBoxBottom; }
 	const Rectangle& GetHitBoxTop() const { return m_HitBoxTop; }
 	Vector2 GetPipeGapCenter() const;

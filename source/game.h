@@ -35,6 +35,7 @@ private:
 	bool m_IsOnGround{ false };
 	int m_Score{ 0 };
 	int m_ClosestPipeIdx{ 0 };
+	int m_NextPipeIdx{ 0 };
 
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
@@ -57,6 +58,7 @@ private:
 	void RestartGame();
 
 	int GetClosestPipeIdx() const;
+	int GetNextPipeIdx() const;
 	bool AreAllBirdsDead() const;
 
 	static const Texture2D* s_pSpriteSheet;

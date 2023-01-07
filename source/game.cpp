@@ -4,6 +4,8 @@
 #include "game.h"
 #include "constants.h"
 
+#include <algorithm>
+
 bool Game::s_GameOver{ false };
 const Texture2D* Game::s_pSpriteSheet{ nullptr };
 float Game::s_GroundHeight{ .0f };
@@ -27,7 +29,7 @@ Game::Game()
 		m_Birds.emplace_back(new Bird{});
 	}
 
-	s_GroundHeight = m_GroundSprite.GetHeight();
+	s_GroundHeight = m_GroundSprite.GetScaledHeight();
 
 	ConfigureGameScreen();
 	SelectRandomBackground();
@@ -67,6 +69,7 @@ void Game::Update(float elapsedSec)
 	}
 
 	m_ClosestPipeIdx = GetClosestPipeIdx();
+	m_NextPipeIdx = GetNextPipeIdx();
 
 	if (m_Pipes[m_ClosestPipeIdx]->IsOffScreen())
 	{
@@ -77,7 +80,7 @@ void Game::Update(float elapsedSec)
 	for (const auto& bird : m_Birds)
 	{
 		bird->Update(elapsedSec);
-		bird->CalculateBirdPipeHeightDelta(m_Pipes[m_ClosestPipeIdx]->GetPipeGapCenter());
+		bird->CalculateBirdPipeHeightDelta(m_Pipes[m_NextPipeIdx]->GetPipeGapCenter());
 
 		if (bird->IsDead()) continue;
 
@@ -226,7 +229,7 @@ void Game::RestartGame()
 	}
 
 	m_Score = 0;
-	m_StartGame = false;
+	//m_StartGame = false;
 	s_GameOver = false;
 	m_IsOnGround = false;
 }
@@ -244,14 +247,26 @@ int Game::GetClosestPipeIdx() const
 	}
 	return closestPipeIdx;
 }
-
 bool Game::AreAllBirdsDead() const
 {
+	return std::none_of(m_Birds.begin(), m_Birds.end(), [](const auto& bird) { return !bird->IsDead(); });
+}
+
+int Game::GetNextPipeIdx() const
+{
+	// Returns the next pipe the bird needs to go through
 	for (const auto& bird : m_Birds)
 	{
-		if (!bird->IsDead()) return false;
+		if (bird->IsDead()) continue;
+
+		// If the birds x position is greater than the pipes x position + the pipes width closestPipeIdx
+		// the return the index of the next pipe
+		if (m_Pipes[m_NextPipeIdx]->GetPosition().x + m_Pipes[m_NextPipeIdx]->GetScaledWidth() < bird->GetPosition().x)
+		{
+			return (m_NextPipeIdx + 1) % MAX_PIPES;
+		}
+		return m_NextPipeIdx;
 	}
-	return true;
 }
 
 void Game::ConfigureGameScreen()
