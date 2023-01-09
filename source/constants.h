@@ -9,7 +9,6 @@ constexpr float ROTATION_SPEED_UP{ 600.f };
 constexpr float ROTATION_SPEED_DOWN{ 480.f };
 constexpr float MAX_UPWARD_ROTATION{ 20.f };
 constexpr float MAX_DOWNWARD_ROTATION{ 90.f };
-constexpr int MAX_BIRDS{ 1 };
 
 // ---------- Game Constants ----------
 constexpr float MOVE_SPEED{ 60.f };
@@ -28,5 +27,10 @@ constexpr const char* const SPRITE_SHEET_PATH{ "../assets/images/spritesheet.png
 
 // --------- Window Constants ---------
 constexpr const char* const WINDOW_TITLE{ "Flappy Bird AI" };
+
+// ----------- AI Constants -----------
+constexpr int POPULATION_SIZE{ 5 };
+constexpr int SAMPLE_SIZE{ 3 };
+constexpr float MUTATION_RATE{ .1f };
 
 #endif

@@ -1,6 +1,7 @@
 #include "pipe.h"
 #include "game.h"
 #include "constants.h"
+#include "utils.h"
 
 void Pipe::Draw() const
 {
@@ -73,7 +74,7 @@ void Pipe::RefreshPosition()
 void Pipe::SetRandomHeight()
 {
 	// Set a random height for the top pipe
-	const float randomHeight{ static_cast<float>(GetRandomValue(-MAX_PIPE_HEIGHT / 2, MAX_PIPE_HEIGHT / 2)) - Game::GetGroundHeight() };
+	const float randomHeight{ utils::RandomFloat(-MAX_PIPE_HEIGHT * .5f, MAX_PIPE_HEIGHT * .5f) - Game::GetGroundHeight() };
 
 	// Set the height of the top pipe
 	m_TopPipeSprite.AddPosY(randomHeight * .5f);

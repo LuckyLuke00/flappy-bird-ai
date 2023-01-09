@@ -24,21 +24,29 @@ public:
 	void CalculateBirdPipeHeightDelta(const Vector2& pipeCenter);
 	void Flap();
 	void RotateBird(float elapsedSec);
+	void MutateJumpAtDelta();
 
 	// Setters
 	void SelectRandomBird();
 	void Initialize();
 	void RefreshPosition();
 	void SetDeath(const bool isDead) { m_Dead = isDead; }
+	void SetJumpAtDelta(const float jumpAtDelta) { m_JumpAtDelta = jumpAtDelta; }
 
 	// Getters
 	bool IsDead() const { return m_Dead; }
 	const Vector2& GetPosition() const { return m_BirdSprite.GetPosition(); }
+	float GetFitness() const { return m_Fitness; }
 	float GetHitCircleRadius() const { return m_Radius * Sprite::GetGlobalScale().y; }
+	float GetJumpAtDelta() const { return m_JumpAtDelta; }
 	float GetScaledHeight() const { return m_BirdSprite.GetScaledHeight(); }
 	Vector2 GetHitCircleCenter() const { return m_BirdSprite.GetCenter(); }
 
 private:
+	// Genetic Algorithm member variables
+	float m_Fitness{ .0f };
+	float m_JumpAtDelta{ .0f };
+
 	bool m_Dead{ false };
 	const Vector2 m_Offset{ -28.f, -1.f };
 	float m_BirdPipeDelta{ .0f };
@@ -66,6 +74,8 @@ private:
 	bool IsOutOfBounds() const;
 	bool IsOnGround() const;
 	bool IsFalling() const;
+
+	// Function that selects the best birds from the population
 };
 
 #endif

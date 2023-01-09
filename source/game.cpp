@@ -3,8 +3,11 @@
 
 #include "game.h"
 #include "constants.h"
+#include "utils.h"
 
 #include <algorithm>
+#include <iterator>
+#include <iostream>
 
 bool Game::s_GameOver{ false };
 const Texture2D* Game::s_pSpriteSheet{ nullptr };
@@ -17,16 +20,16 @@ Game::Game()
 	s_pSpriteSheet = new const Texture2D{ LoadTexture(SPRITE_SHEET_PATH) };
 
 	// Initialize the Pipes (Fill with 3 pipes)
-	m_Pipes.reserve(MAX_PIPES);
+	m_pPipes.reserve(MAX_PIPES);
 	for (int i{ 0 }; i < MAX_PIPES; ++i)
 	{
-		m_Pipes.emplace_back(new Pipe{});
+		m_pPipes.emplace_back(new Pipe{});
 	}
 
-	m_Birds.reserve(MAX_BIRDS);
-	for (int i{ 0 }; i < MAX_BIRDS; ++i)
+	m_pBirds.reserve(POPULATION_SIZE);
+	for (int i{ 0 }; i < POPULATION_SIZE; ++i)
 	{
-		m_Birds.emplace_back(new Bird{});
+		m_pBirds.emplace_back(new Bird{});
 	}
 
 	s_GroundHeight = m_GroundSprite.GetScaledHeight();
@@ -47,15 +50,16 @@ void Game::Update(float elapsedSec)
 	if (AreAllBirdsDead())
 	{
 		s_GameOver = true;
-		for (const auto& bird : m_Birds)
+		for (const auto& bird : m_pBirds)
 		{
 			bird->Update(elapsedSec);
 		}
-		return;
+		UpdateGeneticAlgorithm();
+		//return;
 	}
 
 	MoveGround(elapsedSec, MOVE_SPEED);
-	for (auto& bird : m_Birds)
+	for (auto& bird : m_pBirds)
 	{
 		bird->UpdateAnimation(elapsedSec);
 	}
@@ -63,7 +67,7 @@ void Game::Update(float elapsedSec)
 	// Game started
 	if (!m_StartGame) return;
 
-	for (const auto& pipe : m_Pipes)
+	for (const auto& pipe : m_pPipes)
 	{
 		pipe->Update(elapsedSec);
 	}
@@ -71,20 +75,20 @@ void Game::Update(float elapsedSec)
 	m_ClosestPipeIdx = GetClosestPipeIdx();
 	m_NextPipeIdx = GetNextPipeIdx();
 
-	if (m_Pipes[m_ClosestPipeIdx]->IsOffScreen())
+	if (m_pPipes[m_ClosestPipeIdx]->IsOffScreen())
 	{
-		m_Pipes[m_ClosestPipeIdx]->SetPosX(m_Pipes[(m_ClosestPipeIdx - 1 + MAX_PIPES) % MAX_PIPES]->GetPosition().x);
-		m_Pipes[m_ClosestPipeIdx]->AddPosX(PIPE_HORIZONTAL_GAP + m_Pipes[m_ClosestPipeIdx]->GetWidth());
+		m_pPipes[m_ClosestPipeIdx]->SetPosX(m_pPipes[(m_ClosestPipeIdx - 1 + MAX_PIPES) % MAX_PIPES]->GetPosition().x);
+		m_pPipes[m_ClosestPipeIdx]->AddPosX(PIPE_HORIZONTAL_GAP + m_pPipes[m_ClosestPipeIdx]->GetWidth());
 	}
 
-	for (const auto& bird : m_Birds)
+	for (const auto& bird : m_pBirds)
 	{
 		bird->Update(elapsedSec);
-		bird->CalculateBirdPipeHeightDelta(m_Pipes[m_NextPipeIdx]->GetPipeGapCenter());
+		bird->CalculateBirdPipeHeightDelta(m_pPipes[m_NextPipeIdx]->GetPipeGapCenter());
 
 		if (bird->IsDead()) continue;
 
-		if (m_Pipes[m_ClosestPipeIdx]->HasPassed(bird->GetHitCircleCenter()))
+		if (m_pPipes[m_ClosestPipeIdx]->HasPassed(bird->GetHitCircleCenter()))
 		{
 			++m_Score;
 		}
@@ -100,12 +104,12 @@ void Game::Draw() const
 
 	m_BackgroundSprite.Draw(); // Draw first
 
-	for (const auto& pipe : m_Pipes)
+	for (const auto& pipe : m_pPipes)
 	{
 		pipe->Draw();
 	}
 
-	for (const auto& bird : m_Birds)
+	for (const auto& bird : m_pBirds)
 	{
 		bird->Draw();
 	}
@@ -156,13 +160,13 @@ void Game::ToggleFps()
 
 void Game::CleanUp()
 {
-	for (auto& pipe : m_Pipes)
+	for (auto& pipe : m_pPipes)
 	{
 		delete pipe;
 		pipe = nullptr;
 	}
 
-	for (auto& bird : m_Birds)
+	for (auto& bird : m_pBirds)
 	{
 		delete bird;
 		bird = nullptr;
@@ -193,10 +197,10 @@ void Game::HandleInput()
 	{
 		// Start the game on the first flap
 		m_StartGame = true;
-		for (const auto& bird : m_Birds)
-		{
-			bird->Flap();
-		}
+		//for (const auto& bird : m_pBirds)
+		//{
+		//	bird->Flap();
+		//}
 	}
 }
 
@@ -204,10 +208,10 @@ void Game::HandleCollision()
 {
 	if (m_IsOnGround) return;
 
-	for (const auto& bird : m_Birds)
+	for (const auto& bird : m_pBirds)
 	{
-		if (CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_Pipes[m_ClosestPipeIdx]->GetHitBoxTop()) ||
-			CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_Pipes[m_ClosestPipeIdx]->GetHitBoxBottom()))
+		if (CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_pPipes[m_ClosestPipeIdx]->GetHitBoxTop()) ||
+			CheckCollisionCircleRec(bird->GetHitCircleCenter(), bird->GetHitCircleRadius(), m_pPipes[m_ClosestPipeIdx]->GetHitBoxBottom()))
 		{
 			bird->SetDeath(true);
 		}
@@ -218,14 +222,14 @@ void Game::RestartGame()
 {
 	m_BackgroundSprite.ResetSrcRect();
 	SelectRandomBackground();
-	for (const auto& bird : m_Birds)
+	for (const auto& bird : m_pBirds)
 	{
 		bird->Initialize();
 	}
 
 	for (int i{ 0 }; i < MAX_PIPES; ++i)
 	{
-		m_Pipes[i]->Initialize(PIPE_HORIZONTAL_GAP * static_cast<float>(i) + m_Pipes[i]->GetWidth() * static_cast<float>(i));
+		m_pPipes[i]->Initialize(PIPE_HORIZONTAL_GAP * static_cast<float>(i) + m_pPipes[i]->GetWidth() * static_cast<float>(i));
 	}
 
 	m_Score = 0;
@@ -240,7 +244,7 @@ int Game::GetClosestPipeIdx() const
 	int closestPipeIdx{ 0 };
 	for (int i{ 0 }; i < MAX_PIPES; ++i)
 	{
-		if (m_Pipes[i]->GetPosition().x < m_Pipes[closestPipeIdx]->GetPosition().x)
+		if (m_pPipes[i]->GetPosition().x < m_pPipes[closestPipeIdx]->GetPosition().x)
 		{
 			closestPipeIdx = i;
 		}
@@ -249,19 +253,50 @@ int Game::GetClosestPipeIdx() const
 }
 bool Game::AreAllBirdsDead() const
 {
-	return std::none_of(m_Birds.begin(), m_Birds.end(), [](const auto& bird) { return !bird->IsDead(); });
+	return std::none_of(m_pBirds.begin(), m_pBirds.end(), [](const auto& bird) { return !bird->IsDead(); });
+}
+
+void Game::UpdateGeneticAlgorithm()
+{
+	// Update the generation
+	++m_Generation;
+
+	// Sort the birds in descending order of fitness
+	std::sort(m_pBirds.begin(), m_pBirds.end(), [](const auto& lhs, const auto& rhs)
+		{
+			return lhs->GetFitness() > rhs->GetFitness();
+		});
+
+	// Select the fittest birds
+	std::vector<Bird*> pBestBirds;
+	pBestBirds.reserve(SAMPLE_SIZE);
+
+	// Print the best birds data
+	std::cout << "Generation: #" << m_Generation << '\n'
+		<< "Fitness: " << m_pBirds.front()->GetFitness() << '\n'
+		<< "Jump at Delta: " << m_pBirds.front()->GetJumpAtDelta() << "\n\n";
+
+	std::copy_n(m_pBirds.begin(), SAMPLE_SIZE, std::back_inserter(pBestBirds));
+
+	// Mutate the best birds
+	for (int i{ 1 }; i < m_pBirds.size(); ++i)
+	{
+		m_pBirds[i]->SetJumpAtDelta(pBestBirds[utils::RandomInt(0, SAMPLE_SIZE - 1)]->GetJumpAtDelta() * utils::RandomFloat(1.f - MUTATION_RATE, 1.f + MUTATION_RATE));
+	}
+
+	RestartGame();
 }
 
 int Game::GetNextPipeIdx() const
 {
 	// Returns the next pipe the bird needs to go through
-	for (const auto& bird : m_Birds)
+	for (const auto& bird : m_pBirds)
 	{
 		if (bird->IsDead()) continue;
 
 		// If the birds x position is greater than the pipes x position + the pipes width closestPipeIdx
 		// the return the index of the next pipe
-		if (m_Pipes[m_NextPipeIdx]->GetPosition().x + m_Pipes[m_NextPipeIdx]->GetScaledWidth() < bird->GetPosition().x)
+		if (m_pPipes[m_NextPipeIdx]->GetPosition().x + m_pPipes[m_NextPipeIdx]->GetScaledWidth() < bird->GetPosition().x)
 		{
 			return (m_NextPipeIdx + 1) % MAX_PIPES;
 		}
@@ -285,23 +320,23 @@ void Game::ConfigureGameScreen()
 
 	if (!m_StartGame)
 	{
-		for (const auto& bird : m_Birds)
+		for (const auto& bird : m_pBirds)
 		{
 			bird->Initialize();
 		}
 
 		for (int i{ 0 }; i < MAX_PIPES; ++i)
 		{
-			m_Pipes[i]->Initialize(PIPE_HORIZONTAL_GAP * static_cast<float>(i) + m_Pipes[i]->GetWidth() * static_cast<float>(i));
+			m_pPipes[i]->Initialize(PIPE_HORIZONTAL_GAP * static_cast<float>(i) + m_pPipes[i]->GetWidth() * static_cast<float>(i));
 		}
 	}
 	else
 	{
-		for (const auto& bird : m_Birds)
+		for (const auto& bird : m_pBirds)
 		{
 			bird->RefreshPosition();
 		}
-		for (const auto& pipe : m_Pipes)
+		for (const auto& pipe : m_pPipes)
 		{
 			pipe->RefreshPosition();
 		}

@@ -1,18 +1,27 @@
 #include "bird.h"
 #include "constants.h"
 #include "game.h"
+#include "utils.h"
 
 #include <iostream>
 
 Bird::Bird()
 	: m_BirdAnimation{ m_BirdSprite, m_BirdAnimationFrames, m_AnimFrames, m_FrameDuration, m_Boomerang }
 {
+	// Initialize with random value
+	m_JumpAtDelta = utils::RandomFloat(.0f, GAME_HEIGHT * .5f);
 }
 
 void Bird::Update(float elapsedSec)
 {
 	m_PosPercent.x = m_BirdSprite.GetPosition().x / static_cast<float>(GetScreenWidth());
 	m_PosPercent.y = m_BirdSprite.GetPosition().y / static_cast<float>(GetScreenHeight());
+
+	if (!m_Dead)
+	{
+		// Update distance traveled
+		m_Fitness += MOVE_SPEED * elapsedSec;
+	}
 
 	if (!Game::IsGameOver() && m_Dead)
 	{
@@ -26,12 +35,11 @@ void Bird::Update(float elapsedSec)
 		return;
 	}
 
-	//// DEBUG
-	//// Let the bird play it self
-	//if (m_BirdPipeDelta > 35.f)
-	//{
-	//	Flap();
-	//}
+	// Let the bird play it self
+	if (m_BirdPipeDelta > m_JumpAtDelta * Sprite::GetGlobalScale().x)
+	{
+		Flap();
+	}
 
 	// Apply gravity
 	m_VerticalSpeed += GRAVITY * elapsedSec;
@@ -101,6 +109,9 @@ void Bird::Initialize()
 	m_BirdSprite.SetRotation(0.f);
 	m_BirdSprite.CenterOnScreen();
 
+	// Reset fitness
+	m_Fitness = .0f;
+
 	// Add an offset
 	m_BirdSprite.AddPosX(m_Offset.x);
 	m_BirdSprite.AddPosY(m_Offset.y);
@@ -153,4 +164,9 @@ void Bird::RotateBird(float elapsedSec)
 			m_BirdSprite.SetRotation(MAX_DOWNWARD_ROTATION);
 		}
 	}
+}
+
+void Bird::MutateJumpAtDelta()
+{
+	m_JumpAtDelta *= utils::RandomFloat(1.f - MUTATION_RATE, 1.f + MUTATION_RATE);
 }

@@ -36,12 +36,13 @@ private:
 	int m_Score{ 0 };
 	int m_ClosestPipeIdx{ 0 };
 	int m_NextPipeIdx{ 0 };
+	int m_Generation{ 0 };
 
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
 
-	std::vector<Bird*> m_Birds{};
-	std::vector<Pipe*> m_Pipes;
+	std::vector<Bird*> m_pBirds{};
+	std::vector<Pipe*> m_pPipes;
 
 	// Fps values
 	bool m_ShowFps{ false };
@@ -60,6 +61,9 @@ private:
 	int GetClosestPipeIdx() const;
 	int GetNextPipeIdx() const;
 	bool AreAllBirdsDead() const;
+
+	// Function that updates the genetic algorithm
+	void UpdateGeneticAlgorithm();
 
 	static const Texture2D* s_pSpriteSheet;
 	static Rectangle s_GameScreenRect;
