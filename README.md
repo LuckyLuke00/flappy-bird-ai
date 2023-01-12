@@ -9,6 +9,8 @@
 
 This project is a Flappy bird game where the computer learns to play it by itself using a genetic algorithm. The game was implemented in C++ using the Raylib library. The final result is that the bird never hits any pipes. The genetic algorithm tries to find the optimal difference between the center of the pipe gap and the bird's y position to start flapping.
 
+![Flappy Bird AI Demo](./assets/demo.gif)
+
 </div>
 
 ## Design/Implementation
