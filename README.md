@@ -21,6 +21,7 @@ This project is a Flappy bird game where the computer learns to play it by itsel
     - Evaluate the fitness of each strategy by measuring the distance traveled.
     - Keep the best bird.
     - Apply crossover and mutation to generate new birds.
+    - Press the space bar to start learning.
 3. Repeat the process until the bird no longer hits any pipes.
 
 ## How to Use
