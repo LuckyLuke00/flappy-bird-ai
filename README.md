@@ -21,7 +21,6 @@ This project is a Flappy bird game where the computer learns to play it by itsel
     - Evaluate the fitness of each strategy by measuring the distance traveled.
     - Keep the best bird.
     - Apply crossover and mutation to generate new birds.
-    - Press the space bar to start learning.
 3. Repeat the process until the bird no longer hits any pipes.
 
 ## How to Use
@@ -31,6 +30,7 @@ This project is a Flappy bird game where the computer learns to play it by itsel
 1. Clone the repository.
 2. Open the solution with Visual Studio 2022.
 3. Build and run the project.
+4. Press the space bar to start learning.
 
 **Warning:** Occasionally, when launching the project, Raylib can take a while to initialize. The program will appear to be stuck, but it isn't. Just wait for a little and the game will start.
 
