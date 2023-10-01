@@ -22,8 +22,8 @@ constexpr int MAX_PIPES{ 3 };
 constexpr int MAX_PIPE_HEIGHT{ 100 };
 
 // ---------- Path Constants ----------
-constexpr const char* const GAME_ICON_PATH{ "../assets/images/icon.png" };
-constexpr const char* const SPRITE_SHEET_PATH{ "../assets/images/spritesheet.png" };
+constexpr const char* const GAME_ICON_PATH{ "./assets/images/icon.png" };
+constexpr const char* const SPRITE_SHEET_PATH{ "./assets/images/spritesheet.png" };
 
 // --------- Window Constants ---------
 constexpr const char* const WINDOW_TITLE{ "Flappy Bird AI" };
