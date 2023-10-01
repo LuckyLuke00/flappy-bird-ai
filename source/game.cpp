@@ -55,7 +55,6 @@ void Game::Update(float elapsedSec)
 			bird->Update(elapsedSec);
 		}
 		UpdateGeneticAlgorithm();
-		//return;
 	}
 
 	MoveGround(elapsedSec, MOVE_SPEED);
@@ -197,10 +196,6 @@ void Game::HandleInput()
 	{
 		// Start the game on the first flap
 		m_StartGame = true;
-		//for (const auto& bird : m_pBirds)
-		//{
-		//	bird->Flap();
-		//}
 	}
 }
 
@@ -233,7 +228,6 @@ void Game::RestartGame()
 	}
 
 	m_Score = 0;
-	//m_StartGame = false;
 	s_GameOver = false;
 	m_IsOnGround = false;
 }
@@ -279,7 +273,7 @@ void Game::UpdateGeneticAlgorithm()
 	std::copy_n(m_pBirds.begin(), SAMPLE_SIZE, std::back_inserter(pBestBirds));
 
 	// Mutate the best birds
-	for (int i{ 1 }; i < m_pBirds.size(); ++i)
+	for (size_t i{ 1 }; i < m_pBirds.size(); ++i)
 	{
 		m_pBirds[i]->SetJumpAtDelta(pBestBirds[utils::RandomInt(0, SAMPLE_SIZE - 1)]->GetJumpAtDelta() * utils::RandomFloat(1.f - MUTATION_RATE, 1.f + MUTATION_RATE));
 	}
@@ -302,6 +296,8 @@ int Game::GetNextPipeIdx() const
 		}
 		return m_NextPipeIdx;
 	}
+
+	return 0;
 }
 
 void Game::ConfigureGameScreen()
