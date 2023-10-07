@@ -59,18 +59,6 @@ void Bird::Update(float elapsedSec)
 void Bird::Draw() const
 {
 	m_BirdSprite.Draw();
-
-	//// DEBUG
-	//const Vector2& pos{ m_BirdSprite.GetPosition() };
-	//const Vector2& center{ m_BirdSprite.GetCenter() };
-	//DrawLine
-	//(
-	//	static_cast<int>(center.x),
-	//	static_cast<int>(pos.y),
-	//	static_cast<int>(center.x),
-	//	static_cast<int>(pos.y - m_BirdPipeDelta),
-	//	RED
-	//);
 }
 
 void Bird::UpdateAnimation(float elapsedSec)

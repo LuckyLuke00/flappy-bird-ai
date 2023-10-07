@@ -31,6 +31,6 @@ constexpr const char* const WINDOW_TITLE{ "Flappy Bird AI" };
 // ----------- AI Constants -----------
 constexpr int POPULATION_SIZE{ 5 };
 constexpr int SAMPLE_SIZE{ 3 };
-constexpr float MUTATION_RATE{ .1f };
+constexpr float MUTATION_RATE{ .5f };
 
 #endif

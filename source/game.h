@@ -37,6 +37,9 @@ private:
 	int m_ClosestPipeIdx{ 0 };
 	int m_NextPipeIdx{ 0 };
 	int m_Generation{ 0 };
+	int m_LogTextPadding{ 20 };
+	float m_BestFitness{ 0.f };
+	float m_BestJumpDelta{ 0.f };
 
 	Sprite m_BackgroundSprite{ { .0f, .0f, 144.f , 256.f } };
 	Sprite m_GroundSprite{ { 292.f, .0f, 168.f, 56.f } };
@@ -54,6 +57,13 @@ private:
 	void CropScreen() const;
 	void CleanUp();
 
+	// Text drawing
+	void DrawFPS() const;
+	void DrawGeneration() const;
+	void DrawFitness() const;
+	void DrawJumpDelta() const;
+	void DrawScore() const;
+
 	void HandleInput();
 	void HandleCollision();
 	void RestartGame();
@@ -62,8 +72,11 @@ private:
 	int GetNextPipeIdx() const;
 	bool AreAllBirdsDead() const;
 
+	void PrintInstructions() const;
+
 	// Function that updates the genetic algorithm
 	void UpdateGeneticAlgorithm();
+	void SortBirdsVector();
 
 	static const Texture2D* s_pSpriteSheet;
 	static Rectangle s_GameScreenRect;

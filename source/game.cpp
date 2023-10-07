@@ -36,6 +36,8 @@ Game::Game()
 
 	ConfigureGameScreen();
 	SelectRandomBackground();
+
+	PrintInstructions();
 }
 
 Game::~Game()
@@ -117,32 +119,18 @@ void Game::Draw() const
 
 	if (m_ShowFps)
 	{
-		constexpr int padding{ 20 };
-		const int fontSize{ static_cast<int>(5.f * Sprite::GetGlobalScale().x) };
-		DrawText
-		(
-			TextFormat("FPS: %i", GetFPS()),
-			static_cast<int>(m_BackgroundSprite.GetPosition().x + padding),
-			padding,
-			fontSize,
-			BLACK
-		);
+		DrawFPS();
 	}
 
 	// Draw the score in the middle of the screen
 	if (m_StartGame)
 	{
-		const int fontSize{ static_cast<int>(15.f * Sprite::GetGlobalScale().x) };
-		const int scoreWidth{ MeasureText(TextFormat("%i", m_Score), fontSize) };
-		DrawText
-		(
-			TextFormat("%i", m_Score),
-			GetScreenWidth() / 2 - scoreWidth / 2,
-			GetScreenHeight() / 6 - fontSize / 2,
-			fontSize,
-			BLACK
-		);
+		DrawScore();
 	}
+
+	DrawGeneration();
+	DrawFitness();
+	DrawJumpDelta();
 
 	EndDrawing();
 }
@@ -174,6 +162,72 @@ void Game::CleanUp()
 	UnloadTexture(*s_pSpriteSheet);
 	delete s_pSpriteSheet;
 	s_pSpriteSheet = nullptr;
+}
+
+void Game::DrawFPS() const
+{
+	const int fontSize{ static_cast<int>(5.f * Sprite::GetGlobalScale().x) };
+	DrawText
+	(
+		TextFormat("FPS: %i", GetFPS()),
+		static_cast<int>(m_BackgroundSprite.GetPosition().x) + m_LogTextPadding,
+		m_LogTextPadding,
+		fontSize,
+		BLACK
+	);
+}
+
+void Game::DrawGeneration() const
+{
+	const int fontSize{ static_cast<int>(5.f * Sprite::GetGlobalScale().x) };
+	DrawText
+	(
+		TextFormat("Generation: #%i", m_Generation),
+		static_cast<int>(m_BackgroundSprite.GetPosition().x) + m_LogTextPadding,
+		m_LogTextPadding + fontSize * 2,
+		fontSize,
+		BLACK
+	);
+}
+
+void Game::DrawFitness() const
+{
+	const int fontSize{ static_cast<int>(5.f * Sprite::GetGlobalScale().x) };
+	DrawText
+	(
+		TextFormat("Fitness: %.2f", m_BestFitness),
+		static_cast<int>(m_BackgroundSprite.GetPosition().x) + m_LogTextPadding,
+		m_LogTextPadding + fontSize * 3,
+		fontSize,
+		BLACK
+	);
+}
+
+void Game::DrawJumpDelta() const
+{
+	const int fontSize{ static_cast<int>(5.f * Sprite::GetGlobalScale().x) };
+	DrawText
+	(
+		TextFormat("Jump at Delta: %.2f", m_BestJumpDelta),
+		static_cast<int>(m_BackgroundSprite.GetPosition().x) + m_LogTextPadding,
+		m_LogTextPadding + fontSize * 4,
+		fontSize,
+		BLACK
+	);
+}
+
+void Game::DrawScore() const
+{
+		const int fontSize{ static_cast<int>(15.f * Sprite::GetGlobalScale().x) };
+		const int scoreWidth{ MeasureText(TextFormat("%i", m_Score), fontSize) };
+		DrawText
+		(
+			TextFormat("%i", m_Score),
+			GetScreenWidth() / 2 - scoreWidth / 2,
+			GetScreenHeight() / 6 - fontSize / 2,
+			fontSize,
+			BLACK
+		);
 }
 
 void Game::HandleInput()
@@ -250,16 +304,20 @@ bool Game::AreAllBirdsDead() const
 	return std::none_of(m_pBirds.begin(), m_pBirds.end(), [](const auto& bird) { return !bird->IsDead(); });
 }
 
+void Game::PrintInstructions() const
+{
+	std::cout << "\n====== Controls ======\n"
+			<< "Press [SPACE] to start the game\n"
+			<< "Press [F] to toggle FPS\n"
+			<< "Press [R] to restart the game\n\n";
+}
+
 void Game::UpdateGeneticAlgorithm()
 {
 	// Update the generation
 	++m_Generation;
 
-	// Sort the birds in descending order of fitness
-	std::sort(m_pBirds.begin(), m_pBirds.end(), [](const auto& lhs, const auto& rhs)
-		{
-			return lhs->GetFitness() > rhs->GetFitness();
-		});
+	SortBirdsVector();
 
 	// Select the fittest birds
 	std::vector<Bird*> pBestBirds;
@@ -267,8 +325,8 @@ void Game::UpdateGeneticAlgorithm()
 
 	// Print the best birds data
 	std::cout << "Generation: #" << m_Generation << '\n'
-		<< "Fitness: " << m_pBirds.front()->GetFitness() << '\n'
-		<< "Jump at Delta: " << m_pBirds.front()->GetJumpAtDelta() << "\n\n";
+		<< "Fitness: " << m_BestFitness << '\n'
+		<< "Jump at Delta: " << m_BestJumpDelta << "\n\n";
 
 	std::copy_n(m_pBirds.begin(), SAMPLE_SIZE, std::back_inserter(pBestBirds));
 
@@ -279,6 +337,18 @@ void Game::UpdateGeneticAlgorithm()
 	}
 
 	RestartGame();
+}
+
+void Game::SortBirdsVector()
+{
+	// Sort the birds in descending order of fitness
+	std::sort(m_pBirds.begin(), m_pBirds.end(), [](const auto& lhs, const auto& rhs)
+		{
+			return lhs->GetFitness() > rhs->GetFitness();
+		});
+
+	m_BestFitness = m_pBirds.front()->GetFitness();
+	m_BestJumpDelta = m_pBirds.front()->GetJumpAtDelta();
 }
 
 int Game::GetNextPipeIdx() const
