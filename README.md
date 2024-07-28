@@ -1,3 +1,5 @@
+<section align="center">
+
 # Flappy Bird AI: Teaching an AI to Fly
 
 [![Raylib](https://img.shields.io/badge/Raylib-4.2.0-1864ab?style=flat-square&labelColor=212529)](https://www.raylib.com/)
@@ -7,7 +9,9 @@
 
 This project is a Flappy bird game where the computer learns to play it by itself using a genetic algorithm. The game was implemented in C++ using the Raylib library. The final result is that the bird never hits any pipes. The genetic algorithm tries to find the optimal difference between the center of the pipe gap and the bird's y position to start flapping.
 
-![Flappy Bird AI Demo](./assets/demo.gif)
+![Flappy Bird AI Demo](./source/assets/demo.gif)
+
+</section>
 
 ## Design/Implementation
 
